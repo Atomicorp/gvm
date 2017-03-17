@@ -10,7 +10,7 @@ Source0: %{name}-setup
 Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
 Source2: openvas-scap-sync-cronjob
 Source3: openvas-cert-sync-cronjob
-Source3: openvas-nvt-sync-cronjob
+Source4: openvas-nvt-sync-cronjob
 License: AGPL
 URL: http://www.openvas.org
 Group: System Environment/Libraries
@@ -68,6 +68,7 @@ install -m0700 %{SOURCE0} %{buildroot}/usr/bin/openvas-setup
 install -m0700 %{SOURCE1} %{buildroot}/usr/bin/openvas-check-setup
 install -Dp -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-scap
 install -Dp -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-cert
+install -Dp -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-nvt
 
 
 %clean
