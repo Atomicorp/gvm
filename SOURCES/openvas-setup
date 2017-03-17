@@ -185,6 +185,13 @@ stty echo
 /usr/sbin/openvasmd  --create-user=$USERNAME >/dev/null 2>&1
 /usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
 
+#
+echo
+echo "Updating the openvas NVT Cache"
+echo
+/usr/sbin/openvasmd --update --progress
+
+
 echo
 echo "Setup complete, you can now access GSAD at:"
 echo "  https://<IP>:9392"
