@@ -1,0 +1,44 @@
+stages:
+  - build
+
+build-el7-x86_64:
+  stage: build
+  before_script:
+    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    - mkdir -p ~/mock
+    - cp mock/* ~/mock/
+    - cp *.spec ~/rpmbuild/SPECS/
+    - cp SOURCES/* ~/rpmbuild/SOURCES/
+    
+
+  script:
+    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el7-x86_64 openvas.spec /mnt/repo/atomic-testing/centos/7/x86_64/ ; else  gitlab-build.sh el7-x86_64 openvas.spec /mnt/repo/atomic-bleeding/centos/7/x86_64/ ; fi )
+
+ 
+
+build-fc24-x86_64:
+  stage: build
+  before_script:
+    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    - mkdir -p ~/mock
+    - cp mock/* ~/mock/
+    - cp openvas.spec ~/rpmbuild/SPECS/
+    - cp SOURCES/* ~/rpmbuild/SOURCES/
+
+
+  script:
+    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc24-x86_64 openvas.spec /mnt/repo/atomic-testing/fedora/24/x86_64/ ; else  gitlab-build.sh fc24-x86_64 openvas.spec /mnt/repo/atomic-bleeding/fedora/24/x86_64/ ; fi )
+
+
+build-fc25-x86_64:
+  stage: build
+  before_script:
+    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    - mkdir -p ~/mock
+    - cp mock/* ~/mock/
+    - cp openvas.spec ~/rpmbuild/SPECS/
+    - cp SOURCES/* ~/rpmbuild/SOURCES/
+
+
+  script:
+    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc25-x86_64 openvas.spec /mnt/repo/atomic-testing/fedora/25/x86_64 ; else  gitlab-build.sh fc25-x86_64 openvas.spec /mnt/repo/atomic-bleeding/fedora/25/x86_64 ; fi )
