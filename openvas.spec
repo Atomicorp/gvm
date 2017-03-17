@@ -80,6 +80,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/openvas-check-setup
 /etc/cron.d/openvas-sync-scap
 /etc/cron.d/openvas-sync-cert
+/etc/cron.d/openvas-sync-nvt
+
 
 %changelog
 * Thu Dec 22 2016 Scott R. Shinn <scott@atomicorp.com> - 1.0-24
