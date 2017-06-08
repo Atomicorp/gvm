@@ -45,13 +45,15 @@ Requires: haveged
 %if  0%{!?rhel} >= 6
 Requires: ovaldi
 # PDF reports
-Requires: texlive-texconfig texlive-metafont-bin 
+Requires: texlive-texconfig texlive-metafont-bin  
 %else
 Requires: texlive-texmf-latex
+Requires: texlive-collection-latexextra
 %endif
 
 %if 0%{?fedora} >= 21
 Requires: texlive-comment
+Requires: texlive-collection-latexextra
 %endif
  
 
