@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-VERSION=2.0
+VERSION=2.1
 
 # Functions
 
@@ -104,7 +104,7 @@ fi
 if ! grep -q ^unixsocketperm.*700 /etc/redis.conf; then
 	echo "unixsocketperm 700" >> /etc/redis.conf
 fi
-service redis start
+/usr/sbin/service redis start
 
 
 /sbin/service openvas-scanner restart  >/dev/null 2>&1
@@ -112,8 +112,17 @@ echo -n "Pausing while openvas-scanner loads NVTs..."
 sleep 10
 echo "Done"
 
-# start scanner
-/usr/sbin/openvasmd --migrate >/dev/null 2>&1 || :
+# Start openvas manager, use rngd to speed up the key process
+pidof rngd > /dev/null
+if [[ $? -ne 0 ]]; then
+	rngd -r /dev/urandom
+fi
+
+if [  -f /var/lib/openvas/mgr/tasks.db ]; then
+	/usr/sbin/openvasmd --migrate --progress 
+else
+	/usr/sbin/openvasmd --rebuild --progress 
+fi
 
 /sbin/service openvas-manager restart  >/dev/null 2>&1
 
@@ -130,7 +139,7 @@ echo
 check_input "Allow connections from any IP? [Default: yes]" "yes|no" "yes"
 GSAD_ACCESS=$INPUTTEXT
 if [ "$INPUTTEXT" == "yes" ]; then
-  /usr/bin/perl -p -i -e "s[^GSA_ADDRESS=.*][GSA_ADDRESS=0.0.0.0]g" /etc/sysconfig/gsad
+  sed -i "s/^GSA_ADDRESS=.*/GSA_ADDRESS=0.0.0.0/g" /etc/sysconfig/gsad
   /sbin/service gsad restart
 fi
 
@@ -185,17 +194,13 @@ stty echo
 /usr/sbin/openvasmd  --create-user=$USERNAME >/dev/null 2>&1
 /usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
 
-#
-echo
-echo "Updating the openvas NVT Cache"
-echo
-/usr/sbin/openvasmd --update --progress
-
-
 echo
 echo "Setup complete, you can now access GSAD at:"
 echo "  https://<IP>:9392"
 echo
+
+# Stop rngd
+killall rngd
 
 # Add to startup for systemd based systems
 if [ -x /bin/systemctl ]; then

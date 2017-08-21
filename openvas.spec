@@ -43,6 +43,8 @@ Requires: dirb
 Requires: haveged
 
 Requires: ovaldi
+Requires: gnutls-utils
+
 %if  0%{!?rhel} >= 6
 # PDF reports
 Requires: texlive-texconfig texlive-metafont-bin  
