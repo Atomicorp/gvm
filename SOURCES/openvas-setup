@@ -193,6 +193,7 @@ stty echo
 # Create admin user
 /usr/sbin/openvasmd  --create-user=$USERNAME >/dev/null 2>&1
 /usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
+/usr/sbin/openvasmd --rebuild --progress 
 
 echo
 echo "Setup complete, you can now access GSAD at:"
