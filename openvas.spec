@@ -44,6 +44,7 @@ Requires: haveged
 
 Requires: ovaldi
 Requires: gnutls-utils
+Requires: rng-tools
 
 %if  0%{!?rhel} >= 6
 # PDF reports
