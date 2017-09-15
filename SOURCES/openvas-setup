@@ -195,10 +195,30 @@ stty echo
 /usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
 /usr/sbin/openvasmd --rebuild --progress 
 
+# Register scanners
+
+# TODO: is scanner running
+echo
+echo -n "Checking for scanners: "
+SCANNER=$(/usr/sbin/openvasmd --get-scanners)
+echo "Done"
+
+if ! echo $SCANNER | grep -q nmap ; then
+	echo "Adding nmap scanner"
+	service ospd-nmap start
+	/usr/sbin/openvasmd  --create-scanner=ospd-nmap --scanner-host=localhost --scanner-port=40001 --scanner-type=OSP --scanner-ca-pub=/var/lib/openvas/CA/cacert.pem --scanner-key-pub=/var/lib/openvas/CA/clientcert.pem --scanner-key-priv=/var/lib/openvas/private/CA/clientkey.pem
+	echo
+fi
+
+
+
+
+# Complete
 echo
 echo "Setup complete, you can now access GSAD at:"
 echo "  https://<IP>:9392"
 echo
+
 
 # Stop rngd
 killall rngd
@@ -208,6 +228,7 @@ if [ -x /bin/systemctl ]; then
 	systemctl enable openvas-scanner
 	systemctl enable openvas-manager
       	systemctl enable gsad
+	systemctl enable ospd-nmap
 fi
 
 # End

@@ -25,6 +25,8 @@ Requires: openvas-cli
 Requires: openvas-manager
 Requires: greenbone-security-assistant
 Requires: redis
+Requires: psmisc
+Requires: OSPd-nmap
 
 # Support packages:
 Requires: nmap
