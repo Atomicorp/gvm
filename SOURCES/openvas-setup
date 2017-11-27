@@ -104,6 +104,7 @@ fi
 if ! grep -q ^unixsocketperm.*700 /etc/redis.conf; then
 	echo "unixsocketperm 700" >> /etc/redis.conf
 fi
+/usr/bin/systemctl enable redis
 /usr/sbin/service redis start
 
 
