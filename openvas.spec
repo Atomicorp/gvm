@@ -44,7 +44,8 @@ Requires: alien
 Requires: dirb
 Requires: haveged
 
-Requires: ovaldi
+# not supported on fc27 now
+#Requires: ovaldi
 Requires: gnutls-utils
 Requires: rng-tools
 
