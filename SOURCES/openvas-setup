@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Author: Scott R. Shinn <scott@atomicorp.com>
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2,
 # or at your option any later version, as published by the
@@ -14,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-VERSION=2.1
+VERSION=3.0
 
 # Functions
 
@@ -43,6 +45,16 @@ function check_input {
 echo
 echo "Openvas Setup, Version: $VERSION"
 echo 
+
+# Test for selinux
+SELINUX=$(getenforce)
+if [ "$SELINUX" != "Disabled" ]; then
+	echo "Error: Selinux is set to ($SELINUX)"
+	echo "  selinux must be disabled in order to use openvas"
+	echo "  exiting...."
+	exit 1
+fi
+
 
 # Download NVT updates
 echo
@@ -104,8 +116,12 @@ fi
 if ! grep -q ^unixsocketperm.*700 /etc/redis.conf; then
 	echo "unixsocketperm 700" >> /etc/redis.conf
 fi
-/usr/bin/systemctl enable redis
+
+# Bugfix for openvas (temporary)
+sed -i "s/^save/#save/g" /etc/redis.conf
 /usr/sbin/service redis start
+
+
 
 
 /sbin/service openvas-scanner restart  >/dev/null 2>&1
@@ -196,30 +212,10 @@ stty echo
 /usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
 /usr/sbin/openvasmd --rebuild --progress 
 
-# Register scanners
-
-# TODO: is scanner running
-echo
-echo -n "Checking for scanners: "
-SCANNER=$(/usr/sbin/openvasmd --get-scanners)
-echo "Done"
-
-if ! echo $SCANNER | grep -q nmap ; then
-	echo "Adding nmap scanner"
-	service ospd-nmap start
-	/usr/sbin/openvasmd  --create-scanner=ospd-nmap --scanner-host=localhost --scanner-port=40001 --scanner-type=OSP --scanner-ca-pub=/var/lib/openvas/CA/cacert.pem --scanner-key-pub=/var/lib/openvas/CA/clientcert.pem --scanner-key-priv=/var/lib/openvas/private/CA/clientkey.pem
-	echo
-fi
-
-
-
-
-# Complete
 echo
 echo "Setup complete, you can now access GSAD at:"
 echo "  https://<IP>:9392"
 echo
-
 
 # Stop rngd
 killall rngd
@@ -229,7 +225,6 @@ if [ -x /bin/systemctl ]; then
 	systemctl enable openvas-scanner
 	systemctl enable openvas-manager
       	systemctl enable gsad
-	systemctl enable ospd-nmap
 fi
 
 # End
