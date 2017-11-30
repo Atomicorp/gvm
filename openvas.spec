@@ -22,6 +22,7 @@ BuildArch:      noarch
 
 Requires: openvas-scanner
 Requires: openvas-cli
+Requires: greenbone-gvm-tools
 Requires: openvas-manager
 Requires: greenbone-security-assistant
 Requires: redis
