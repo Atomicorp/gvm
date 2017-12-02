@@ -75,4 +75,6 @@ build-fc27-x86_64:
 test-el7-x86_65:
   stage: test
   script: 
-    - cd tests && docker build .
+    - cd tests && docker build --build-arg HTTP_PROXY=http://10.66.6.1:3128 --build-arg http_proxy=http://10.66.6.1:3128  --build-arg RSYNC_PROXY=10.66.6.1:3128 .
+
+

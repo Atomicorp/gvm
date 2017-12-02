@@ -8,7 +8,13 @@ ADD run.sh /run.sh
 ADD config/gsad /etc/sysconfig/gsad
 ADD config/redis.conf /etc/redis.conf
 ADD config/texlive.repo /etc/yum.repos.d/texlive.repo
+
+# Uses the internal atomic-testing repo
 ADD config/atomic-testing.repo /etc/yum.repos.d/atomic-testing.repo
+
+RUN yum -y install wget
+RUN cd /root; NON_INT=1 wget -q -O - https://updates.atomicorp.com/installers/atomic |sh
+
 
 RUN \
 	yum clean all && \
