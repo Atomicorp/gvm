@@ -33,11 +33,11 @@ RUN texhash
 RUN yum -y install openvas OSPd-nmap OSPd
 
 
-RUN \
-	/usr/sbin/greenbone-nvt-sync && \
-	/usr/sbin/greenbone-certdata-sync && \
-	/usr/sbin/greenbone-scapdata-sync && \
-	BUILD=true /run.sh 
+#RUN \
+#	/usr/sbin/greenbone-nvt-sync && \
+#	/usr/sbin/greenbone-certdata-sync && \
+#	/usr/sbin/greenbone-scapdata-sync && \
+#	BUILD=true /run.sh 
 
 
 RUN rm -rf /var/cache/yum/*
