@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Openvas Packaging Project 
 
@@ -57,4 +58,7 @@ The [Atomicorp Openvas Docker Project](https://github.com/atomicorp/openvas-dock
 * Jan-Oliver Wagner @Greenbone
 
 * Everyone at Greenbone that made this project possible
+=======
+Openvas Suite packages
+>>>>>>> a39fe6aee85465a45f2ef9f361d12b72ff39dd92
 
