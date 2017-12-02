@@ -19,6 +19,7 @@ RUN cd /root; NON_INT=1 wget -q -O - https://updates.atomicorp.com/installers/at
 RUN \
 	yum clean all && \
 	yum -y update &&  \
+	yum -y install deltarpm  yum-plugin-fastestmirror && \
 	yum -y install alien bzip2 useradd net-tools openssh texlive-changepage texlive-titlesec  texlive-collection-latexextra
 
 # PDF fixes
