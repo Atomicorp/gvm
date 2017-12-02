@@ -1,0 +1,231 @@
+#!/bin/sh
+
+# Author: Scott R. Shinn <scott@atomicorp.com>
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2,
+# or at your option any later version, as published by the
+# Free Software Foundation
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+VERSION=3.0
+
+# Functions
+
+# Input validation function 
+# check_input <msg> <valid responses regex> <default>
+# if <default> is passed on as null, then there is no default
+# Example: check_input  "Some question (yes/no) " "yes|no"  "yes"
+function check_input {
+  message=$1
+  validate=$2
+  default=$3
+
+  while [ $? -ne 1 ]; do
+    echo -n "$message "
+    read INPUTTEXT < /dev/tty
+    if [ "$INPUTTEXT" == "" -a "$default" != "" ]; then
+      INPUTTEXT=$default
+      return 1
+    fi
+    echo $INPUTTEXT | egrep -q "$validate" && return 1
+    echo "Invalid input"
+  done
+}
+
+
+echo
+echo "Openvas Setup, Version: $VERSION"
+echo 
+
+# Test for selinux
+SELINUX=$(getenforce)
+if [ "$SELINUX" != "Disabled" ]; then
+	echo "Error: Selinux is set to ($SELINUX)"
+	echo "  selinux must be disabled in order to use openvas"
+	echo "  exiting...."
+	exit 1
+fi
+
+
+# Download NVT updates
+echo
+echo "Step 1: Update NVT, CERT, and SCAP data"
+echo "Please note this step could take some time."
+echo "Once completed, this will be updated automatically every 24 hours"
+echo
+
+echo "Select download method"
+echo "* wget (NVT download only) "
+echo "* curl (NVT download only) "
+echo "* rsync"
+echo
+echo "  Note: If rsync requires a proxy, you should define that before this step."
+
+check_input "Downloader [Default: rsync]" "rsync|wget|curl" "rsync"
+
+echo "Updating NVTs...." 
+
+if [ "$INPUTTEXT" == "rsync" -o "$INPUTTEXT" == "" ]; then
+	/usr/sbin/greenbone-nvt-sync || exit 1
+
+	echo "Updating CERT data..."
+	/usr/sbin/greenbone-certdata-sync  $DL_OPT
+	if [ $? -ne 0 ]; then
+		echo "Error: CERT data download did not complete"
+	fi
+
+	echo "Updating SCAP data..."
+	#if [ ! -d /var/lib/openvas/scap-data/private ]; then
+	##	mkdir -p /var/lib/openvas/scap-data/private
+	#fi
+
+	/usr/sbin/greenbone-scapdata-sync $DL_OPT
+	if [ $? -ne 0 ]; then
+		echo "Error: CERT data download did not complete"
+	fi
+
+else
+	if [ "$INPUTTEXT" == "wget" ]; then
+		DL_OPT="--wget"
+	else
+		DL_OPT="--curl"
+	fi
+	/usr/sbin/greenbone-nvt-sync $DL_OPT || exit 1
+fi
+
+
+
+echo "Updating OpenVAS Manager database...."
+
+/usr/bin/openvas-manage-certs -a
+
+# redis setup
+if ! grep -q ^unixsocket.*/tmp/redis.sock /etc/redis.conf ; then
+	echo "unixsocket /tmp/redis.sock" >> /etc/redis.conf
+fi
+
+if ! grep -q ^unixsocketperm.*700 /etc/redis.conf; then
+	echo "unixsocketperm 700" >> /etc/redis.conf
+fi
+
+# Bugfix for openvas (temporary)
+sed -i "s/^save/#save/g" /etc/redis.conf
+/usr/sbin/service redis start
+
+
+
+
+/sbin/service openvas-scanner restart  >/dev/null 2>&1
+echo -n "Pausing while openvas-scanner loads NVTs..."
+sleep 10
+echo "Done"
+
+# Start openvas manager, use rngd to speed up the key process
+pidof rngd > /dev/null
+if [[ $? -ne 0 ]]; then
+	rngd -r /dev/urandom
+fi
+
+if [  -f /var/lib/openvas/mgr/tasks.db ]; then
+	/usr/sbin/openvasmd --migrate --progress 
+else
+	/usr/sbin/openvasmd --rebuild --progress 
+fi
+
+/sbin/service openvas-manager restart  >/dev/null 2>&1
+
+
+
+# Configure GSAD, localhost only, or  0.0.0.0
+echo
+echo "Step 2: Configure GSAD"
+echo "The Greenbone Security Assistant is a Web Based front end"
+echo "for managing scans. By default it is configured to only allow"
+echo "connections from localhost."
+echo
+
+check_input "Allow connections from any IP? [Default: yes]" "yes|no" "yes"
+GSAD_ACCESS=$INPUTTEXT
+if [ "$INPUTTEXT" == "yes" ]; then
+  sed -i "s/^GSA_ADDRESS=.*/GSA_ADDRESS=0.0.0.0/g" /etc/sysconfig/gsad
+  /sbin/service gsad restart
+fi
+
+# Configure Admin user
+echo 
+echo "Step 3: Choose the GSAD admin users password."
+echo "The admin user is used to configure accounts,"
+echo "Update NVT's manually, and manage roles."
+echo 
+
+echo -n "Enter administrator username [Default: admin] : "
+read USERNAME
+
+if [ "$USERNAME" == "" ]; then
+	USERNAME=admin
+fi
+
+# Suppress output of password.
+if [[ -t 0 ]]; then
+	stty -echo
+fi
+
+# Prompt the user for the desired password and verify its accuracy.  
+PASSCONFIRMED=0
+while [ $PASSCONFIRMED -lt 1 ]; do
+	echo -n "Enter Administrator Password: "
+	read PASSWORD 
+    	echo
+
+    	echo -n "Verify Administrator Password: "
+    	read PASSWORD2 
+    	echo
+
+
+    	if [ "$PASSWORD" == "$PASSWORD2" ]; then
+		if [ "$PASSWORD" == "" ]; then
+			echo "Empty password not allowed."
+			PASSCONFIRMED=0
+		else
+      			PASSCONFIRMED=1
+		fi
+      		echo
+    	else
+      		echo "Passwords do not match"
+      		echo
+    	fi
+done
+stty echo
+
+
+# Create admin user
+/usr/sbin/openvasmd  --create-user=$USERNAME >/dev/null 2>&1
+/usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
+/usr/sbin/openvasmd --rebuild --progress 
+
+echo
+echo "Setup complete, you can now access GSAD at:"
+echo "  https://<IP>:9392"
+echo
+
+# Stop rngd
+killall rngd
+
+# Add to startup for systemd based systems
+if [ -x /bin/systemctl ]; then
+	systemctl enable openvas-scanner
+	systemctl enable openvas-manager
+      	systemctl enable gsad
+fi
+
+# End
+
