@@ -1,0 +1,6 @@
+[atomic-testing]
+name=Atomic testing el7
+baseurl=http://loggerhead/channels/atomic-testing/centos/7/x86_64/
+enabled=1
+gpgcheck=1
+file=https://www.atomicorp.com/RPM-GPG-KEY.art.txt

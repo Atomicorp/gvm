@@ -1,0 +1,6 @@
+[TeXLive]
+name=TeXLive Packages for CentOS 7 - $basearch
+baseurl=https://raw.githubusercontent.com/FluidityProject/yum-centos7-texlive/master/$basearch
+enabled=1
+gpgcheck=0
+

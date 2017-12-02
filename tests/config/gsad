@@ -1,0 +1,11 @@
+OPTIONS=""
+#
+# The address the Greenbone Security Assistant will listen on.
+#
+GSA_ADDRESS=0.0.0.0
+#
+# The port the Greenbone Security Assistant will listen on.
+#
+GSA_PORT=443
+
+
