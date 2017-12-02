@@ -7,7 +7,9 @@ MAINTAINER Support <support@atomicorp.com>
 ADD run.sh /run.sh
 ADD config/gsad /etc/sysconfig/gsad
 ADD config/redis.conf /etc/redis.conf
-ADD config/texlive.repo /etc/yum.repos.d/texlive.repo
+# This is only used for pdf reports, something we cant test in here anyway
+# Its a massive download
+#ADD config/texlive.repo /etc/yum.repos.d/texlive.repo
 
 # Uses the internal atomic-testing repo
 ADD config/internal-testing.repo /etc/yum.repos.d/internal-testing.repo
