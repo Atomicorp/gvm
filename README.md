@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 # Openvas Packaging Project 
 
 The Openvas packaging project is an Atomicorp designed project to install and configure the [Openvas](http://www.openvas.org) vulnerability scanner on a self contained Redhat, Centos or Fedora system.
@@ -58,7 +56,4 @@ The [Atomicorp Openvas Docker Project](https://github.com/atomicorp/openvas-dock
 * Jan-Oliver Wagner @Greenbone
 
 * Everyone at Greenbone that made this project possible
-=======
-Openvas Suite packages
->>>>>>> a39fe6aee85465a45f2ef9f361d12b72ff39dd92
 
