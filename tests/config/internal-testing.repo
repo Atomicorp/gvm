@@ -1,0 +1,16 @@
+[internal-atomic-testing]
+name=Internal Atomic testing el7
+baseurl=http://loggerhead/channels/atomic-testing/centos/7/x86_64/
+enabled=1
+# not working?
+gpgcheck=0
+file=https://www.atomicorp.com/RPM-GPG-KEY.art.txt
+
+[internal-atomic-bleeding]
+name=Internal Atomic bleeding el7
+baseurl=http://loggerhead/channels/atomic-bleeding/centos/7/x86_64/
+enabled=1
+# not working?
+gpgcheck=0
+file=https://www.atomicorp.com/RPM-GPG-KEY.art.txt
+
