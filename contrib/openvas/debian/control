@@ -1,0 +1,27 @@
+Source: openvas
+Section: net
+Priority: optional
+Maintainer: Debian Security Tools Packaging Team <pkg-security-team@lists.alioth.debian.org>
+Uploaders: ChangZhuo Chen (陳昌倬) <czchen@debian.org>,
+           SZ Lin (林上智) <szlin@debian.org>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 4.1.1
+Homepage: http://www.openvas.org/
+Vcs-Git: https://anonscm.debian.org/git/pkg-security/openvas.git
+Vcs-Browser: https://anonscm.debian.org/git/pkg-security/openvas.git
+
+Package: openvas
+Architecture: all
+Depends: ${misc:Depends},
+         openvas-manager (>= 7.0.0),
+         openvas-scanner (>= 5.1.0),
+         greenbone-security-assistant(>= 7.0.0),
+         openvas-cli (>= 1.4.5),
+Recommends: sqlite3, xsltproc, rsync
+Description: remote network security auditor - dummy package
+ The Open Vulnerability Assessment System is a modular security auditing tool,
+ used for testing remote systems for vulnerabilities that should be fixed.
+ .
+ It is made up of several parts: a manager i.e. the main server openvasmd.
+ A scanner openvassd that execute vulnerability checking scripts. A cli and
+ a web interface called Greenbone Security Assistant gsad.

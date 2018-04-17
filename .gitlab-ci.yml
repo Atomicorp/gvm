@@ -1,6 +1,24 @@
 stages:
+  - prep
   - build
   - test
+
+# Ubuntu 16
+# EOL: 04/01/2021
+build-xenial-x86_64:
+  stage: prep
+  before_script:
+    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    - rm -rf ~/rpmbuild/BUILD/* || true
+    - cp *.spec ~/rpmbuild/SPECS/
+    - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
+    - cp buildsys-tools/* ~/bin/
+    - chmod +x ~/bin/build-debian.sh
+
+  script:
+    -  (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  dist=xenial arch=amd64 ~/bin/build-debian.sh -b openvas.spec /mnt/repo/atomic-testing/debian/; else  dist=xenial arch=amd64 ~/bin/build-debian.sh -b openvas.spec /mnt/repo/atomic-bleeding/debian/; fi )
+
 
 build-el7-x86_64:
   stage: build
