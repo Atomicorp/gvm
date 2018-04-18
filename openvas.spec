@@ -4,9 +4,9 @@
 
 Summary: The Open Vulnerability Assessment (OpenVAS) suite
 Name:    openvas
-Version: 1.0
+Version: 9.0.2
 Release: RELEASE-AUTO%{?dist}.art
-Source0: %{name}-setup
+Source0: openvas-%{version}
 Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
 Source2: openvas-scap-sync-cronjob
 Source3: openvas-cert-sync-cronjob
@@ -75,11 +75,13 @@ openvas is a meta-package encompassing all of the components from OpenVAS.
 
 %prep
 
+%setup
+
 %build
 
 %install
 mkdir -p %{buildroot}/usr/bin/
-install -m0700 %{SOURCE0} %{buildroot}/usr/bin/openvas-setup
+install -m0700 openvas-setup %{buildroot}/usr/bin/openvas-setup
 install -m0700 %{SOURCE1} %{buildroot}/usr/bin/openvas-check-setup
 install -Dp -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-scap
 install -Dp -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-cert
