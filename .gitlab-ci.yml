@@ -5,6 +5,26 @@ stages:
 
 # Ubuntu 16
 # EOL: 04/01/2021
+build-kali-x86_64:
+  stage: prep
+  before_script:
+    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    - rm -rf ~/rpmbuild/BUILD/* || true
+    - cp *.spec ~/rpmbuild/SPECS/
+    - rm -rf ~/rpmbuild/SOURCES/*
+    - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
+    - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
+    - cp buildsys-tools/* ~/bin/
+    - chmod +x ~/bin/build-debian.sh
+
+  script:
+    -  (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  dist=kali arch=amd64 ~/bin/build-debian.sh -b openvas.spec /mnt/repo/atomic-testing/debian/; else  dist=kali arch=amd64 ~/bin/build-debian.sh -b openvas.spec /mnt/repo/atomic-bleeding/debian/; fi )
+
+
+
+# Ubuntu 16
+# EOL: 04/01/2021
 build-xenial-x86_64:
   stage: prep
   before_script:
@@ -30,6 +50,7 @@ build-el7-x86_64:
     - cp mock/* ~/mock/
     - cp *.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
     
 
   script:
@@ -45,6 +66,7 @@ build-fc24-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
 
 
   script:
@@ -59,6 +81,7 @@ build-fc25-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
 
 
   script:
@@ -72,6 +95,7 @@ build-fc26-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
 
 
   script:
@@ -86,6 +110,7 @@ build-fc27-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
 
 
   script:
