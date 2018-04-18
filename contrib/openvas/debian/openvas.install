@@ -1,5 +1,0 @@
-openvas-setup usr/bin/
-openvas-check-setup usr/bin/
-openvas-feed-update usr/bin/
-openvas-start usr/bin/
-openvas-stop usr/bin/
