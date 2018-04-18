@@ -6,7 +6,7 @@ Summary: The Open Vulnerability Assessment (OpenVAS) suite
 Name:    openvas
 Version: 9.0.2
 Release: RELEASE-AUTO%{?dist}.art
-Source0: openvas-%{version}
+Source0: openvas-%{version}.tar.gz
 Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
 Source2: openvas-scap-sync-cronjob
 Source3: openvas-cert-sync-cronjob
