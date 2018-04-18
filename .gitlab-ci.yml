@@ -11,8 +11,9 @@ build-xenial-x86_64:
     - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
     - rm -rf ~/rpmbuild/BUILD/* || true
     - cp *.spec ~/rpmbuild/SPECS/
+    - rm -rf ~/rpmbuild/SOURCES/*
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ../SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.2.tar.gz openvas-9.0.2/ && cd ..
     - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
     - cp buildsys-tools/* ~/bin/
     - chmod +x ~/bin/build-debian.sh
