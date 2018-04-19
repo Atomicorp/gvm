@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Author: Scott R. Shinn <scott@atomicorp.com>
 
@@ -104,35 +104,47 @@ fi
 
 
 
+# Handle certs
 echo "Updating OpenVAS Manager database...."
-
-/usr/bin/openvas-manage-certs -a
+/usr/bin/openvas-manage-certs -V >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	/usr/bin/openvas-manage-certs -a
+fi
 
 # redis setup
-if ! grep -q ^unixsocket.*/tmp/redis.sock /etc/redis.conf ; then
-	echo "unixsocket /tmp/redis.sock" >> /etc/redis.conf
+if [  -f /etc/redis.conf ]; then
+	REDIS_CONF=/etc/redis.conf
+elif [ -f /etc/redis/redis.conf ]; then
+	REDIS_CONF=/etc/redis/redis.conf
+else
+	echo "Error: Redis configuration was not detected"
+	exit 1
+fi
+if ! grep -q ^unixsocket.*/tmp/redis.sock $REDIS_CONF ; then
+	sed -i -e 's/^\(#.\)\?unixsocket \/.*$/unixsocket \/tmp\/redis.sock/' /etc/redis/redis.conf
+
 fi
 
-if ! grep -q ^unixsocketperm.*700 /etc/redis.conf; then
-	echo "unixsocketperm 700" >> /etc/redis.conf
+if ! grep -q ^unixsocketperm.*700 $REDIS_CONF; then
+	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 700/' /etc/redis/redis.conf
 fi
+
 
 # Bugfix for openvas (temporary)
-sed -i "s/^save/#save/g" /etc/redis.conf
+sed -i "s/^save/#save/g" $REDIS_CONF
 /usr/sbin/service redis start
 
-
-
-
-/sbin/service openvas-scanner restart  >/dev/null 2>&1
+/usr/sbin/service openvas-scanner restart  >/dev/null 2>&1
 echo -n "Pausing while openvas-scanner loads NVTs..."
 sleep 10
 echo "Done"
 
 # Start openvas manager, use rngd to speed up the key process
-pidof rngd > /dev/null
-if [[ $? -ne 0 ]]; then
-	rngd -r /dev/urandom
+if  [ -f /usr/sbin/rngd ]; then
+	pidof rngd > /dev/null
+	if [[ $? -ne 0 ]]; then
+		rngd -r /dev/urandom
+	fi
 fi
 
 if [  -f /var/lib/openvas/mgr/tasks.db ]; then
@@ -141,7 +153,7 @@ else
 	/usr/sbin/openvasmd --rebuild --progress 
 fi
 
-/sbin/service openvas-manager restart  >/dev/null 2>&1
+/usr/sbin/service openvas-manager restart  >/dev/null 2>&1
 
 
 
@@ -157,7 +169,7 @@ check_input "Allow connections from any IP? [Default: yes]" "yes|no" "yes"
 GSAD_ACCESS=$INPUTTEXT
 if [ "$INPUTTEXT" == "yes" ]; then
   sed -i "s/^GSA_ADDRESS=.*/GSA_ADDRESS=0.0.0.0/g" /etc/sysconfig/gsad
-  /sbin/service gsad restart
+  /usr/sbin/service gsad restart
 fi
 
 # Configure Admin user
@@ -218,7 +230,9 @@ echo "  https://<IP>:9392"
 echo
 
 # Stop rngd
-killall rngd
+if [ -f /usr/sbin/rngd ]; then
+	killall rngd
+fi
 
 # Add to startup for systemd based systems
 if [ -x /bin/systemctl ]; then

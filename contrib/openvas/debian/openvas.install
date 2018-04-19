@@ -1,0 +1,6 @@
+openvas-setup usr/bin/
+openvas-check-setup usr/bin/
+openvas-cert-sync etc/cron.daily/
+openvas-nvt-sync etc/cron.daily/
+openvas-scap-sync etc/cron.daily/
+

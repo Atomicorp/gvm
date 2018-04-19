@@ -1,0 +1,3 @@
+# start plugin sync daily at 1am
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+0 1 * * * root /usr/sbin/greenbone-nvt-sync

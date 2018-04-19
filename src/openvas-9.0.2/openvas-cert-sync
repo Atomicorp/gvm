@@ -1,0 +1,4 @@
+# start plugin sync daily at 130am
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+30 1 * * * root /usr/sbin/greenbone-certdata-sync
