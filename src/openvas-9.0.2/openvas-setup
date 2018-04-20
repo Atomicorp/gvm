@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-VERSION=3.0
+VERSION=4.0
 
 # Functions
 
@@ -55,6 +55,36 @@ if [ "$SELINUX" != "Disabled" ]; then
 	exit 1
 fi
 
+# redis setup
+if [  -f /etc/redis.conf ]; then
+	REDIS_CONF=/etc/redis.conf
+elif [ -f /etc/redis/redis.conf ]; then
+	REDIS_CONF=/etc/redis/redis.conf
+else
+	echo "Error: Redis configuration was not detected"
+	exit 1
+fi
+
+if ! grep -q "^unixsocket /var/run/redis/redis.sock" /etc/redis/redis.conf ; then
+  	sed -i -e 's/^\(#.\)\?unixsocket \/.*$/unixsocket \/var\/run\/redis\/redis.sock/' /etc/redis/redis.conf
+fi
+
+
+if ! grep -q ^unixsocketperm.*700 $REDIS_CONF; then
+  	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 700/' /etc/redis/redis.conf
+  	sed -i -e 's/^\(#.\)\?port.*$/port 0/' /etc/redis/redis.conf
+fi
+
+# Bugfix for openvas (temporary)
+sed -i "s/^save/#save/g" $REDIS_CONF
+/usr/sbin/service redis restart
+
+if grep -q ^kb_location /etc/openvas/openvassd.conf 2>/dev/null; then
+	sed -i -e 's/kb_location=.*$/kb_location=\/var\/run\/redis\/redis.sock/' /etc/openvas/openvassd.conf
+else
+	echo "kb_location=/var/run/redis/redis.sock" >> /etc/openvas/openvassd.conf
+fi
+
 
 # Download NVT updates
 echo
@@ -64,11 +94,13 @@ echo "Once completed, this will be updated automatically every 24 hours"
 echo
 
 echo "Select download method"
-echo "* wget (NVT download only) "
-echo "* curl (NVT download only) "
-echo "* rsync"
+echo
+echo "  * wget (NVT download only) "
+echo "  * curl (NVT download only) "
+echo "  * rsync"
 echo
 echo "  Note: If rsync requires a proxy, you should define that before this step."
+echo
 
 check_input "Downloader [Default: rsync]" "rsync|wget|curl" "rsync"
 
@@ -111,28 +143,6 @@ if [ $? -ne 0 ]; then
 	/usr/bin/openvas-manage-certs -a
 fi
 
-# redis setup
-if [  -f /etc/redis.conf ]; then
-	REDIS_CONF=/etc/redis.conf
-elif [ -f /etc/redis/redis.conf ]; then
-	REDIS_CONF=/etc/redis/redis.conf
-else
-	echo "Error: Redis configuration was not detected"
-	exit 1
-fi
-if ! grep -q ^unixsocket.*/tmp/redis.sock $REDIS_CONF ; then
-	sed -i -e 's/^\(#.\)\?unixsocket \/.*$/unixsocket \/tmp\/redis.sock/' /etc/redis/redis.conf
-
-fi
-
-if ! grep -q ^unixsocketperm.*700 $REDIS_CONF; then
-	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 700/' /etc/redis/redis.conf
-fi
-
-
-# Bugfix for openvas (temporary)
-sed -i "s/^save/#save/g" $REDIS_CONF
-/usr/sbin/service redis start
 
 /usr/sbin/service openvas-scanner restart  >/dev/null 2>&1
 echo -n "Pausing while openvas-scanner loads NVTs..."
@@ -168,60 +178,66 @@ echo
 check_input "Allow connections from any IP? [Default: yes]" "yes|no" "yes"
 GSAD_ACCESS=$INPUTTEXT
 if [ "$INPUTTEXT" == "yes" ]; then
-  sed -i "s/^GSA_ADDRESS=.*/GSA_ADDRESS=0.0.0.0/g" /etc/sysconfig/gsad
-  /usr/sbin/service gsad restart
+	sed -i "s/^GSA_ADDRESS=.*/GSA_ADDRESS=0.0.0.0/g" /etc/sysconfig/gsad
+	/usr/sbin/service gsad restart
 fi
 
-# Configure Admin user
-echo 
-echo "Step 3: Choose the GSAD admin users password."
-echo "The admin user is used to configure accounts,"
-echo "Update NVT's manually, and manage roles."
-echo 
 
-echo -n "Enter administrator username [Default: admin] : "
-read USERNAME
+if ! openvasmd --get-users | grep -q ^admin$ ; then
 
-if [ "$USERNAME" == "" ]; then
-	USERNAME=admin
-fi
+	# Configure Admin user
+	echo 
+	echo "Step 3: Choose the GSAD admin users password."
+	echo "The admin user is used to configure accounts,"
+	echo "Update NVT's manually, and manage roles."
+	echo 
 
-# Suppress output of password.
-if [[ -t 0 ]]; then
-	stty -echo
-fi
+	echo -n "Enter administrator username [Default: admin] : "
+	read USERNAME
 
-# Prompt the user for the desired password and verify its accuracy.  
-PASSCONFIRMED=0
-while [ $PASSCONFIRMED -lt 1 ]; do
-	echo -n "Enter Administrator Password: "
-	read PASSWORD 
-    	echo
+	if [ "$USERNAME" == "" ]; then
+		USERNAME=admin
+	fi
 
-    	echo -n "Verify Administrator Password: "
-    	read PASSWORD2 
-    	echo
+	# Suppress output of password.
+	if [[ -t 0 ]]; then
+		stty -echo
+	fi
+
+	# Prompt the user for the desired password and verify its accuracy.  
+	PASSCONFIRMED=0
+	while [ $PASSCONFIRMED -lt 1 ]; do
+		echo -n "Enter Administrator Password: "
+		read PASSWORD 
+		echo
+
+		echo -n "Verify Administrator Password: "
+		read PASSWORD2 
+		echo
 
 
-    	if [ "$PASSWORD" == "$PASSWORD2" ]; then
-		if [ "$PASSWORD" == "" ]; then
-			echo "Empty password not allowed."
-			PASSCONFIRMED=0
+		if [ "$PASSWORD" == "$PASSWORD2" ]; then
+			if [ "$PASSWORD" == "" ]; then
+				echo "Empty password not allowed."
+				PASSCONFIRMED=0
+			else
+				PASSCONFIRMED=1
+			fi
+			echo
 		else
-      			PASSCONFIRMED=1
+			echo "Passwords do not match"
+			echo
 		fi
-      		echo
-    	else
-      		echo "Passwords do not match"
-      		echo
-    	fi
-done
-stty echo
+	done
+	stty echo
 
 
-# Create admin user
-/usr/sbin/openvasmd  --create-user=$USERNAME >/dev/null 2>&1
-/usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
+	# Create admin user
+	/usr/sbin/openvasmd  --create-user=$USERNAME >/dev/null 2>&1
+	/usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
+
+fi
+
 /usr/sbin/openvasmd --rebuild --progress 
 
 echo
@@ -233,6 +249,8 @@ echo
 if [ -f /usr/sbin/rngd ]; then
 	killall rngd
 fi
+
+service gsad restart
 
 # Add to startup for systemd based systems
 if [ -x /bin/systemctl ]; then
