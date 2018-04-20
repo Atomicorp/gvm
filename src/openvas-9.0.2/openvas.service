@@ -1,0 +1,15 @@
+[Unit]
+Description=Openvas Security Scanner
+After=network.target
+Requires=openvas-scanner.service
+Requires=openvas-manager.service
+Requires=greenbone-security-assistant.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

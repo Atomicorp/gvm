@@ -137,11 +137,16 @@ fi
 
 
 # Handle certs
-echo "Updating OpenVAS Manager database...."
+echo
+echo -n "Updating OpenVAS Manager certificates: "
 /usr/bin/openvas-manage-certs -V >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-	/usr/bin/openvas-manage-certs -a
+	/usr/bin/openvas-manage-certs -a  >/dev/null 2>&1
+	echo "Complete"
+else
+	echo "Already Exists"
 fi
+echo
 
 
 /usr/sbin/service openvas-scanner restart  >/dev/null 2>&1
