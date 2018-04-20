@@ -175,10 +175,21 @@ echo "for managing scans. By default it is configured to only allow"
 echo "connections from localhost."
 echo
 
+if [ -f /etc/sysconfig/gsad ]; then
+	GSAD_CONF=/etc/sysconfig/gsad
+elif [ -f /etc/default/greenbone-security-assistant ]; then
+	GSAD_CONF=/etc/default/greenbone-security-assistant
+else
+	echo
+	echo "Error: gsad config not found"
+	echo
+
+fi
+
 check_input "Allow connections from any IP? [Default: yes]" "yes|no" "yes"
 GSAD_ACCESS=$INPUTTEXT
 if [ "$INPUTTEXT" == "yes" ]; then
-	sed -i "s/^GSA_ADDRESS=.*/GSA_ADDRESS=0.0.0.0/g" /etc/sysconfig/gsad
+	sed -i "s/^GSA_ADDRESS=.*/GSA_ADDRESS=0.0.0.0/g" $GSAD_CONF
 	/usr/sbin/service gsad restart
 fi
 
@@ -256,7 +267,12 @@ service gsad restart
 if [ -x /bin/systemctl ]; then
 	systemctl enable openvas-scanner
 	systemctl enable openvas-manager
-      	systemctl enable gsad
+	if [ -f /lib/systemd/system/greenbone-security-assistant.service ]; then
+      		systemctl enable greenbone-security-assistant
+	else
+      		systemctl enable gsad
+	fi
+		
 fi
 
 # End
