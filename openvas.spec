@@ -23,9 +23,6 @@ BuildArch:      noarch
 Requires: openvas-scanner
 Requires: openvas-cli
 
-#if 0%{?fedora} >= 24
-#Requires: gvm-tools
-#%endif
 Requires: openvas-manager
 Requires: greenbone-security-assistant
 Requires: redis
