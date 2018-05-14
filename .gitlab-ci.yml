@@ -26,7 +26,7 @@ build-kali-x86_64:
 # Ubuntu 16
 # EOL: 04/01/2021
 build-xenial-x86_64:
-  stage: prep
+  stage: build
   before_script:
     - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
     - rm -rf ~/rpmbuild/BUILD/* || true
@@ -117,7 +117,7 @@ build-fc27-x86_64:
     - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc27-x86_64 openvas.spec /mnt/repo/atomic-testing/fedora/27/x86_64 ; else  gitlab-build.sh fc27-x86_64 openvas.spec /mnt/repo/atomic-bleeding/fedora/27/x86_64 ; fi )
 
 build-fc28-x86_64:
-  stage: build
+  stage: prep
   before_script:
     - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
     - mkdir -p ~/mock
