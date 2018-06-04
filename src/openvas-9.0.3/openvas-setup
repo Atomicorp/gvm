@@ -67,14 +67,14 @@ else
 	exit 1
 fi
 
-if ! grep -q "^unixsocket /var/run/redis/redis.sock" /etc/redis/redis.conf ; then
-  	sed -i -e 's/^\(#.\)\?unixsocket \/.*$/unixsocket \/var\/run\/redis\/redis.sock/' /etc/redis/redis.conf
+if ! grep -q "^unixsocket /var/run/redis/redis.sock" $REDIS_CONF ; then
+  	sed -i -e 's/^\(#.\)\?unixsocket \/.*$/unixsocket \/var\/run\/redis\/redis.sock/' $REDIS_CONF
 fi
 
 
 if ! grep -q ^unixsocketperm.*700 $REDIS_CONF; then
-  	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 700/' /etc/redis/redis.conf
-  	sed -i -e 's/^\(#.\)\?port.*$/port 0/' /etc/redis/redis.conf
+  	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 700/' $REDIS_CONF
+  	sed -i -e 's/^\(#.\)\?port.*$/port 0/' $REDIS_CONF
 fi
 
 # Bugfix for openvas (temporary)
