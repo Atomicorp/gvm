@@ -47,13 +47,15 @@ echo "Openvas Setup, Version: $VERSION"
 echo 
 
 # Test for selinux
+if [ -f /usr/sbin/getenforce ]; then
 SELINUX=$(getenforce 2>/dev/null)
-if [ $? -eq 0 ] ; then
-	if [ "$SELINUX" != "Disabled" ]; then
-		echo "Error: Selinux is set to ($SELINUX)"
-		echo "  selinux must be disabled in order to use openvas"
-		echo "  exiting...."
-		exit 1
+	if [ $? -eq 0 ] ; then
+		if [ "$SELINUX" != "Disabled" ]; then
+			echo "Error: Selinux is set to ($SELINUX)"
+			echo "  selinux must be disabled in order to use openvas"
+			echo "  exiting...."
+			exit 1
+		fi
 	fi
 fi
 
