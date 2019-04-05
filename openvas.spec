@@ -34,11 +34,11 @@ Requires: nmap
 
 Requires: nikto
 Requires: ncrack
-Requires: wapiti
 
 # Tmp, need to sort out alien and w3af for el6, and w3af for el7
 #if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
 #Requires: w3af
+#Requires: wapiti
 Requires: alien
 #%endif
 
