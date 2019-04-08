@@ -83,10 +83,18 @@ fi
 sed -i "s/^save/#save/g" $REDIS_CONF
 /usr/sbin/service redis restart
 
+# dont see this
 if grep -q ^kb_location /etc/openvas/openvassd.conf 2>/dev/null; then
 	sed -i -e 's/kb_location=.*$/kb_location=\/var\/run\/redis\/redis.sock/' /etc/openvas/openvassd.conf
 else
 	echo "kb_location=/var/run/redis/redis.sock" >> /etc/openvas/openvassd.conf
+fi
+
+if grep ^db_address /etc/openvas/openvassd.conf 2>/dev/null; then
+	sed -i -e 's/db_address=.*$/db_address=\/var\/run\/redis\/redis.sock/' /etc/openvas/openvassd.conf
+	
+else
+	echo "db_address=/var/run/redis/redis.sock" >> /etc/openvas/openvassd.conf
 fi
 
 
@@ -143,9 +151,9 @@ fi
 # Handle certs
 echo
 echo -n "Updating OpenVAS Manager certificates: "
-/usr/bin/openvas-manage-certs -V >/dev/null 2>&1
+/usr/bin/gvm-manage-certs -V >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-	/usr/bin/openvas-manage-certs -a  >/dev/null 2>&1
+	/usr/bin/gvm-manage-certs -a  >/dev/null 2>&1
 	echo "Complete"
 else
 	echo "Already Exists"
@@ -166,41 +174,23 @@ if  [ -f /usr/sbin/rngd ]; then
 	fi
 fi
 
-if [  -f /var/lib/openvas/mgr/tasks.db ]; then
-	/usr/sbin/openvasmd --migrate --progress 
-else
-	/usr/sbin/openvasmd --rebuild --progress 
-fi
+# TODO: 9 ->  10 migration
+#if [  -f /var/lib/openvas/mgr/tasks.db ]; then
+#	/usr/sbin/gvmd --migrate --progress 
+#else
+#	/usr/sbin/gvmd --rebuild --progress 
+#fi
 
 /usr/sbin/service openvas-manager restart  >/dev/null 2>&1
 
 
-
-# Configure GSAD, localhost only, or  0.0.0.0
-echo
-echo "Step 2: Configure GSAD"
-echo "The Greenbone Security Assistant is a Web Based front end"
-echo "for managing scans. By default it is configured to only allow"
-echo "connections from localhost."
-echo
-
-if [ -f /etc/sysconfig/gsad ]; then
-	GSAD_CONF=/etc/sysconfig/gsad
-elif [ -f /etc/default/greenbone-security-assistant ]; then
-	GSAD_CONF=/etc/default/greenbone-security-assistant
-else
-	echo
-	echo "Error: gsad config not found"
-	echo
-
-fi
 
 
 if ! openvasmd --get-users | grep -q ^admin$ ; then
 
 	# Configure Admin user
 	echo 
-	echo "Step 3: Choose the GSAD admin users password."
+	echo "Step 2: Choose the GSAD admin users password."
 	echo "The admin user is used to configure accounts,"
 	echo "Update NVT's manually, and manage roles."
 	echo 
@@ -246,12 +236,10 @@ if ! openvasmd --get-users | grep -q ^admin$ ; then
 
 
 	# Create admin user
-	/usr/sbin/openvasmd  --create-user=$USERNAME >/dev/null 2>&1
-	/usr/sbin/openvasmd  --user=$USERNAME --new-password=$PASSWORD
+	/usr/sbin/gvmd  --create-user=$USERNAME >/dev/null 2>&1
+	/usr/sbin/gvmd  --user=$USERNAME --new-password=$PASSWORD
 
 fi
-
-/usr/sbin/openvasmd --rebuild --progress 
 
 echo
 echo "Setup complete, you can now access GSAD at:"
