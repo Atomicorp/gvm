@@ -41,6 +41,32 @@ function check_input {
   done
 }
 
+function download_update() {
+	RETRIES=0
+	DOWNLOAD_SUCCESS=0
+	COMMAND=$1
+	OPTIONS=$2
+
+	while [ $DOWNLOAD_SUCCESS -lt 1 ]; do
+		if [ $RETRIES -gt 2 ]; then
+			echo "Download not successful: too many failed attempts"
+			echo "  rerun  $COMMAND manually"
+			return 
+		fi
+
+		$COMMAND $OPTIONS
+
+		if [ $? -eq 0 ] ; then
+			echo "$COMMAND success"
+			DOWNLOAD_SUCCESS=1
+		else
+			echo "Retrying"
+			RETRIES=$(( $RETRIES + 1 ))
+		fi
+	done
+
+}
+
 
 echo
 echo "Openvas Setup, Version: $VERSION"
@@ -115,37 +141,32 @@ echo "  Note: If rsync requires a proxy, you should define that before this step
 echo
 
 check_input "Downloader [Default: rsync]" "rsync|wget|curl" "rsync"
+if [ "$INPUTTEXT" == "wget" ]; then
+	DL_OPT="--wget"
 
-echo "Updating NVTs...." 
-
-if [ "$INPUTTEXT" == "rsync" -o "$INPUTTEXT" == "" ]; then
-	/usr/sbin/greenbone-nvt-sync || exit 1
-
-	echo "Updating CERT data..."
-	/usr/sbin/greenbone-certdata-sync  $DL_OPT
-	if [ $? -ne 0 ]; then
-		echo "Error: CERT data download did not complete"
-	fi
-
-	echo "Updating SCAP data..."
-	#if [ ! -d /var/lib/openvas/scap-data/private ]; then
-	##	mkdir -p /var/lib/openvas/scap-data/private
-	#fi
-
-	/usr/sbin/greenbone-scapdata-sync $DL_OPT
-	if [ $? -ne 0 ]; then
-		echo "Error: CERT data download did not complete"
-	fi
+elif [ "$INPUTTEXT" == "curl" ]; then
+	DL_OPT="--curl"
 
 else
-	if [ "$INPUTTEXT" == "wget" ]; then
-		DL_OPT="--wget"
-	else
-		DL_OPT="--curl"
-	fi
-	/usr/sbin/greenbone-nvt-sync $DL_OPT || exit 1
+	DL_OPT=""
 fi
 
+echo
+echo "Updating NVTs...." 
+download_update /usr/sbin/greenbone-nvt-sync $DL_OPT
+
+
+echo
+echo "Updating CERT data..."
+download_update /usr/sbin/greenbone-certdata-sync  $DL_OPT
+
+
+echo
+echo "Updating SCAP data..."
+download_update /usr/sbin/greenbone-scapdata-sync $DL_OPT
+
+
+exit
 
 
 # Handle certs
