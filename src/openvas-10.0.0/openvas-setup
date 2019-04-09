@@ -109,6 +109,7 @@ fi
 # Bugfix for openvas (temporary)
 sed -i "s/^save/#save/g" $REDIS_CONF
 /usr/sbin/service redis restart
+systemctl enable redis
 
 # dont see this
 if grep -q ^kb_location /etc/openvas/openvassd.conf 2>/dev/null; then
