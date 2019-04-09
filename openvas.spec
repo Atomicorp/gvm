@@ -65,6 +65,8 @@ Requires: texlive-texmf-latex
 Requires: texlive-comment
 Requires: texlive-collection-latexextra
 %endif
+
+Requires: openvas-smb
  
 
 %description
