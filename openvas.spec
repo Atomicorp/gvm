@@ -4,7 +4,7 @@
 
 Summary: The Open Vulnerability Assessment (OpenVAS) suite
 Name:    openvas
-Version: 9.0.2
+Version: 10.0.0
 Release: RELEASE-AUTO%{?dist}.art
 Source0: openvas-%{version}.tar.gz
 Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
@@ -38,7 +38,7 @@ Requires: ncrack
 # Tmp, need to sort out alien and w3af for el6, and w3af for el7
 #if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
 #Requires: w3af
-#Requires: wapiti
+Requires: wapiti
 Requires: alien
 #%endif
 
@@ -98,6 +98,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Apr 8 2019 Scott R. Shinn <scott@atomicorp.com> - 10.0.0-RELEASE-AUTO
+- Update loader for Openvas 10.0.0
+
 * Thu Dec 22 2016 Scott R. Shinn <scott@atomicorp.com> - 1.0-24
 - Add PATH to cron jobs (Credit: Edwin Eefting)
 

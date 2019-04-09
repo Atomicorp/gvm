@@ -13,7 +13,7 @@ build-kali-x86_64:
     - cp *.spec ~/rpmbuild/SPECS/
     - rm -rf ~/rpmbuild/SOURCES/*
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
     - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
     - cp buildsys-tools/* ~/bin/
     - chmod +x ~/bin/build-debian.sh
@@ -33,7 +33,7 @@ build-xenial-x86_64:
     - cp *.spec ~/rpmbuild/SPECS/
     - rm -rf ~/rpmbuild/SOURCES/*
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
     - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
     - cp buildsys-tools/* ~/bin/
     - chmod +x ~/bin/build-debian.sh
@@ -50,7 +50,7 @@ build-el7-x86_64:
     - cp mock/* ~/mock/
     - cp *.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
     
 
   script:
@@ -66,7 +66,7 @@ build-fc24-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
 
 
   script:
@@ -81,7 +81,7 @@ build-fc25-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
 
 
   script:
@@ -95,7 +95,7 @@ build-fc26-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
 
 
   script:
@@ -110,7 +110,7 @@ build-fc27-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
 
 
   script:
@@ -124,7 +124,7 @@ build-fc28-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
 
 
   script:
@@ -140,7 +140,7 @@ build-fc29-x86_64:
     - cp mock/* ~/mock/
     - cp openvas.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-9.0.3.tar.gz openvas-9.0.3/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/openvas-10.0.0.tar.gz openvas-10.0.0/ && cd ..
 
 
   script:
