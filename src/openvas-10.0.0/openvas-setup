@@ -60,7 +60,8 @@ function download_update() {
 			echo "$COMMAND success"
 			DOWNLOAD_SUCCESS=1
 		else
-			echo "Retrying"
+			echo "Retrying in 3 seconds..."
+			sleep 3
 			RETRIES=$(( $RETRIES + 1 ))
 		fi
 	done
@@ -166,7 +167,6 @@ echo "Updating SCAP data..."
 download_update /usr/sbin/greenbone-scapdata-sync $DL_OPT
 
 
-exit
 
 
 # Handle certs
