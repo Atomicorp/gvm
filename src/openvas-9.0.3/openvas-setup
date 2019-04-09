@@ -174,19 +174,16 @@ if  [ -f /usr/sbin/rngd ]; then
 	fi
 fi
 
-# TODO: 9 ->  10 migration
-#if [  -f /var/lib/openvas/mgr/tasks.db ]; then
-#	/usr/sbin/gvmd --migrate --progress 
-#else
-#	/usr/sbin/gvmd --rebuild --progress 
-#fi
+if [  -f /var/lib/openvas/mgr/tasks.db ]; then
+	/usr/sbin/gvmd --migrate --progress 
+fi
 
 /usr/sbin/service openvas-manager restart  >/dev/null 2>&1
 
 
 
 
-if ! openvasmd --get-users | grep -q ^admin$ ; then
+if ! /usr/sbin/gvmd --get-users | grep -q ^admin$ ; then
 
 	# Configure Admin user
 	echo 
