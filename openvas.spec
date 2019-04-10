@@ -75,7 +75,7 @@ openvas is a meta-package encompassing all of the components from OpenVAS.
 
 %prep
 
-%setup
+%setup -n openvas-%{version}
 
 %build
 
