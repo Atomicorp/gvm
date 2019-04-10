@@ -12,9 +12,9 @@ Source3: openvas-cert-sync-cronjob
 Source4: openvas-nvt-sync-cronjob
 License: AGPL
 URL: http://www.openvas.org
-Group: System Environment/Libraries
 Vendor: Greenbone https://www.greenbone.net
 Packager: https://www.atomicorp.com
+Group: System Environment/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 BuildArch:      noarch
