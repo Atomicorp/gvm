@@ -191,7 +191,7 @@ if [  -f /var/lib/openvas/mgr/tasks.db ]; then
 	/usr/sbin/gvmd --migrate --progress 
 fi
 
-/usr/sbin/service openvas-manager restart  >/dev/null 2>&1
+/usr/sbin/service gvmd restart  >/dev/null 2>&1
 
 
 
@@ -266,7 +266,7 @@ service gsad restart
 # Add to startup for systemd based systems
 if [ -x /bin/systemctl ]; then
 	systemctl enable openvas-scanner
-	systemctl enable openvas-manager
+	systemctl enable gvmd
 	if [ -f /lib/systemd/system/greenbone-security-assistant.service ]; then
       		systemctl enable greenbone-security-assistant
 	else
