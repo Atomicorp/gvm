@@ -83,7 +83,7 @@ openvas is a meta-package encompassing all of the components from OpenVAS.
 %install
 mkdir -p %{buildroot}/usr/bin/
 install -m0700 openvas-setup %{buildroot}/usr/bin/openvas-setup
-install -m0700 %{SOURCE1} %{buildroot}/usr/bin/openvas-check-setup
+#install -m0700 %{SOURCE1} %{buildroot}/usr/bin/openvas-check-setup
 install -Dp -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-scap
 install -Dp -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-cert
 install -Dp -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-nvt
@@ -94,8 +94,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
+%license AGPL.txt
 /usr/bin/openvas-setup
-/usr/bin/openvas-check-setup
+#/usr/bin/openvas-check-setup
 /etc/cron.d/openvas-sync-scap
 /etc/cron.d/openvas-sync-cert
 /etc/cron.d/openvas-sync-nvt
