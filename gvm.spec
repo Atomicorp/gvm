@@ -1,21 +1,20 @@
 %define _prefix /usr
-%define cvs rc1
 
 
 Summary: The Open Vulnerability Assessment (OpenVAS) suite
 Name:    greenbone-vulnerability-manager
 Version: 10.0.0
 Release: RELEASE-AUTO%{?dist}.art
-Source0: openvas-%{version}.tar.gz
-Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
+Source0: gvm-%{version}.tar.gz
+#Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
 Source2: openvas-scap-sync-cronjob
 Source3: openvas-cert-sync-cronjob
 Source4: openvas-nvt-sync-cronjob
 License: AGPL
 URL: http://www.openvas.org
 Group: System Environment/Libraries
-Vendor: OpenVAS Development Team, http://www.openvas.org
-Packager: Scott R. Shinn <scott@atomicorp.com>
+Vendor: Greenbone https://www.greenbone.net
+Packager: https://www.atomicorp.com
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 BuildArch:      noarch
@@ -76,7 +75,7 @@ openvas is a meta-package encompassing all of the components from OpenVAS.
 
 %prep
 
-%setup -n openvas-%{version}
+%autosetup  -n gvm-%{version}
 
 %build
 
@@ -102,6 +101,7 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cron.d/openvas-sync-scap
 /etc/cron.d/openvas-sync-cert
 /etc/cron.d/openvas-sync-nvt
+/usr/share/licenses/greenbone-vulnerability-manager/LICENSE
 
 
 %changelog
