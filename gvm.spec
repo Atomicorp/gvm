@@ -94,7 +94,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%license AGPL.txt
+%license LICENSE
 /usr/bin/openvas-setup
 #/usr/bin/openvas-check-setup
 /etc/cron.d/openvas-sync-scap
