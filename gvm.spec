@@ -82,9 +82,9 @@ openvas is a meta-package encompassing all of the components from OpenVAS.
 
 %install
 mkdir -p %{buildroot}/usr/bin/
-mkdir -p %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager
+mkdir -p %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
 install -m0700 openvas-setup %{buildroot}/usr/bin/openvas-setup
-install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager
+install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
 
 install -Dp -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-scap
 install -Dp -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-cert
