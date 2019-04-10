@@ -18,6 +18,7 @@ Packager: https://www.atomicorp.com
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 BuildArch:      noarch
+Obsoletes: openvas
 Provides: openvas
 Provides: gvm
 
