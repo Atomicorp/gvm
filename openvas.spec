@@ -3,7 +3,7 @@
 
 
 Summary: The Open Vulnerability Assessment (OpenVAS) suite
-Name:    openvas
+Name:    greenbone-vulnerability-manager
 Version: 10.0.0
 Release: RELEASE-AUTO%{?dist}.art
 Source0: openvas-%{version}.tar.gz
@@ -19,6 +19,7 @@ Packager: Scott R. Shinn <scott@atomicorp.com>
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 BuildArch:      noarch
+Provides: openvas
 
 Requires: openvas-scanner
 Requires: openvas-cli
