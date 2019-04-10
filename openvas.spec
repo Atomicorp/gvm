@@ -20,6 +20,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 BuildArch:      noarch
 Provides: openvas
+Provides: gvm
 
 Requires: openvas-scanner
 Requires: openvas-cli
