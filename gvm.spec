@@ -23,7 +23,7 @@ Provides: openvas
 Provides: gvm
 
 Requires: openvas-scanner
-Requires: openvas-cli
+#Requires: openvas-cli
 
 Requires: openvas-manager
 Requires: greenbone-security-assistant
