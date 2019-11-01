@@ -3,7 +3,7 @@
 
 Summary: The Open Vulnerability Assessment (OpenVAS) suite
 Name:    greenbone-vulnerability-manager
-Version: 10.0.0
+Version: 11.0.0
 Release: RELEASE-AUTO%{?dist}.art
 Source0: gvm-%{version}.tar.gz
 #Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
@@ -24,6 +24,8 @@ Provides: gvm
 
 Requires: openvas-scanner
 #Requires: openvas-cli
+Requires: OSPd
+Requires: OSPd-openvas
 
 Requires: openvas-manager
 Requires: greenbone-security-assistant

@@ -56,6 +56,20 @@ build-el7-x86_64:
   script:
     - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el7-x86_64 gvm.spec /mnt/repo/atomic-testing/centos/7/x86_64/ ; else  gitlab-build.sh el7-x86_64 gvm.spec /mnt/repo/atomic-bleeding/centos/7/x86_64/ ; fi )
 
+build-el8-x86_64:
+  stage: build
+  before_script:
+    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    - mkdir -p ~/mock
+    - cp mock/* ~/mock/
+    - cp *.spec ~/rpmbuild/SPECS/
+    - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
+
+
+  script:
+    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-testing/centos/8/x86_64/ ; else  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-bleeding/centos/8/x86_64/ ; fi )
+
  
 
 build-fc28-x86_64:
