@@ -45,7 +45,7 @@ function download_update() {
 			return 
 		fi
 
-		$COMMAND $OPTIONS
+		su - openvas -c "$COMMAND $OPTIONS"
 
 		if [ $? -eq 0 ] ; then
 			echo "$COMMAND success"
@@ -174,10 +174,10 @@ fi
 echo
 
 
-/usr/sbin/service openvas-scanner restart  >/dev/null 2>&1
-echo -n "Pausing while openvas-scanner loads NVTs..."
-sleep 10
-echo "Done"
+#/usr/sbin/service openvas-scanner restart  >/dev/null 2>&1
+#echo -n "Pausing while openvas-scanner loads NVTs..."
+#sleep 10
+#echo "Done"
 
 # Start openvas manager, use rngd to speed up the key process
 if  [ -f /usr/sbin/rngd ]; then
@@ -191,6 +191,24 @@ if [  -f /var/lib/openvas/mgr/tasks.db ]; then
 	/usr/sbin/gvmd --migrate --progress 
 fi
 
+# Set up postgres
+#yum -y install postgresql-server postgresql-contrib
+#postgresql-setup initdb
+#systemctl start postgresql
+#
+su - postgres -c "createuser -DRS root" 
+su - postgres -c "createdb -O root gvmd"
+#su - postgres
+# psql gvmd
+# create role dba with superuser noinherit;
+# grant dba to root;
+# create extension "uuid-ossp";
+
+# root role does not exist?
+# createuser root
+# createdb -O gvmd root
+
+# This service has issues
 /usr/sbin/service gvmd restart  >/dev/null 2>&1
 
 
