@@ -13,7 +13,7 @@ build-kali-x86_64:
     - cp *.spec ~/rpmbuild/SPECS/
     - rm -rf ~/rpmbuild/SOURCES/*
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
     - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
     - cp buildsys-tools/* ~/bin/
     - chmod +x ~/bin/build-debian.sh
@@ -33,7 +33,7 @@ build-xenial-x86_64:
     - cp *.spec ~/rpmbuild/SPECS/
     - rm -rf ~/rpmbuild/SOURCES/*
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
     - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
     - cp buildsys-tools/* ~/bin/
     - chmod +x ~/bin/build-debian.sh
@@ -50,7 +50,7 @@ build-el7-x86_64:
     - cp mock/* ~/mock/
     - cp *.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
     
 
   script:
@@ -64,44 +64,29 @@ build-el8-x86_64:
     - cp mock/* ~/mock/
     - cp *.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
+
+
+  script:
+    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-testing/centos/8/x86_64/ ; else  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-bleeding/centos/8/x86_64/ ; fi )
+
+
+
+build-el8-x86_64:
+  stage: prep
+  before_script:
+    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    - mkdir -p ~/mock
+    - cp mock/* ~/mock/
+    - cp *.spec ~/rpmbuild/SPECS/
+    - cp SOURCES/* ~/rpmbuild/SOURCES/
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
 
 
   script:
     - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-testing/centos/8/x86_64/ ; else  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-bleeding/centos/8/x86_64/ ; fi )
 
  
-
-build-fc28-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp gvm.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
-
-
-  script:
-    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc28-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/28/x86_64 ; else  gitlab-build.sh fc28-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/28/x86_64 ; fi )
-
-
-build-fc29-x86_64:
-  stage: prep
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp gvm.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
-
-
-  script:
-    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc29-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/29/x86_64 ; else  gitlab-build.sh fc29-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/29/x86_64 ; fi )
-
-
 
 build-fc30-x86_64:
   stage: prep
@@ -111,7 +96,7 @@ build-fc30-x86_64:
     - cp mock/* ~/mock/
     - cp gvm.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-10.0.0.tar.gz gvm-10.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
 
 
   script:

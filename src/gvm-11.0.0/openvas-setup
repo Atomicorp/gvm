@@ -192,15 +192,18 @@ if [  -f /var/lib/openvas/mgr/tasks.db ]; then
 fi
 
 # Set up postgres
-#yum -y install postgresql-server postgresql-contrib
-#postgresql-setup initdb
-#systemctl start postgresql
+yum -y install postgresql-server postgresql-contrib
+postgresql-setup initdb
+systemctl start postgresql
+
 #
 su - postgres -c "createuser -DRS root" 
 su - postgres -c "createdb -O root gvmd"
 #su - postgres
 # psql gvmd
-# create role dba with superuser noinherit;
+su - postgres -c "psql gvmd -q --command='create role dba with superuser noinherit;'"
+su - postgres -c "psql gvmd -q --command='grant dba to root;'"
+su - postgres -c "psql gvmd -q --command='create extension \"uuid-ossp\";'"
 # grant dba to root;
 # create extension "uuid-ossp";
 
