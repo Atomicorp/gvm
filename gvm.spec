@@ -36,17 +36,18 @@ Requires: psmisc
 # Support packages:
 Requires: nmap
 
-Requires: nikto
-Requires: ncrack
+# Support packages
+#Requires: nikto
+#Requires: ncrack
 
 # Tmp, need to sort out alien and w3af for el6, and w3af for el7
 #if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
-#Requires: w3af
-Requires: wapiti
-Requires: alien
+##Requires: w3af
+#Requires: wapiti
+#Requires: alien
 #%endif
+#Requires: dirb
 
-Requires: dirb
 Requires: haveged
 
 # not supported on fc27 now
