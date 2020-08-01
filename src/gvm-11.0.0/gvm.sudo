@@ -1,0 +1,2 @@
+gvm ALL = NOPASSWD: /sbin/openvas
+gvm ALL = NOPASSWD: /sbin/gsad

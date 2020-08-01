@@ -7,7 +7,7 @@
 # it under the terms of the Affero GNU General Public License 
 #
 
-VERSION=4.0.1
+VERSION=5.0.0
 
 # Functions
 
@@ -45,7 +45,7 @@ function download_update() {
 			return 
 		fi
 
-		su - openvas -c "$COMMAND $OPTIONS"
+		su - gvm -c "$COMMAND $OPTIONS"
 
 		if [ $? -eq 0 ] ; then
 			echo "$COMMAND success"
@@ -61,7 +61,7 @@ function download_update() {
 
 
 echo
-echo "Openvas Setup, Version: $VERSION"
+echo "GVM Setup, Version: $VERSION"
 echo 
 
 # Test for selinux
@@ -77,6 +77,26 @@ SELINUX=$(getenforce 2>/dev/null)
 	fi
 fi
 
+# TODO: Python check
+alternatives --list |grep python
+
+
+# Set up postgres
+yum -y install postgresql-server postgresql-contrib
+postgresql-setup initdb
+systemctl start postgresql
+
+su - postgres -c "createuser -DRS gvm"
+su - postgres -c "createdb -O gvm gvmd"
+su - postgres -c "psql gvmd -q --command='create role dba with superuser noinherit;'"
+su - postgres -c "psql gvmd -q --command='grant dba to gvm;'"
+su - postgres -c "psql gvmd -q --command='create extension \"uuid-ossp\";'"
+su - postgres -c "psql gvmd -q --command='create extension \"pgcrypto\";'"
+systemctl restart postgresql
+
+
+
+
 # redis setup
 if [  -f /etc/redis.conf ]; then
 	REDIS_CONF=/etc/redis.conf
@@ -87,78 +107,72 @@ else
 	exit 1
 fi
 
+
 if ! grep -q "^unixsocket /var/run/redis/redis.sock" $REDIS_CONF ; then
   	sed -i -e 's/^\(#.\)\?unixsocket \/.*$/unixsocket \/var\/run\/redis\/redis.sock/' $REDIS_CONF
 fi
 
 
-if ! grep -q ^unixsocketperm.*700 $REDIS_CONF; then
-  	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 700/' $REDIS_CONF
+if ! grep -q ^unixsocketperm.*770 $REDIS_CONF; then
+  	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 770/' $REDIS_CONF
   	sed -i -e 's/^\(#.\)\?port.*$/port 0/' $REDIS_CONF
 fi
 
 # Bugfix for openvas (temporary)
 sed -i "s/^save/#save/g" $REDIS_CONF
-/usr/sbin/service redis restart
-systemctl enable redis
-
-# dont see this
-if grep -q ^kb_location /etc/openvas/openvassd.conf 2>/dev/null; then
-	sed -i -e 's/kb_location=.*$/kb_location=\/var\/run\/redis\/redis.sock/' /etc/openvas/openvassd.conf
-else
-	echo "kb_location=/var/run/redis/redis.sock" >> /etc/openvas/openvassd.conf
-fi
 
 if grep ^db_address /etc/openvas/openvassd.conf 2>/dev/null; then
-	sed -i -e 's/db_address=.*$/db_address=\/var\/run\/redis\/redis.sock/' /etc/openvas/openvassd.conf
-	
+	sed -i -e 's/db_address=.*$/db_address=\/var\/run\/redis\/redis.sock/' /etc/openvas/openvas.conf
 else
-	echo "db_address=/var/run/redis/redis.sock" >> /etc/openvas/openvassd.conf
+	echo "db_address=/var/run/redis/redis.sock" >> /etc/openvas/openvas.conf
 fi
+
+# Add uer to redis socket
+if ! groups gvm |grep -q redis ; then
+	usermod -aG redis gvm
+fi
+
+systemctl enable redis
+systemctl start redis
+
+# TODO: Fixing huge memory pages
+#sysctl -w net.core.somaxconn=1024
+#sysctl vm.overcommit_memory=1
+#
+#echo "net.core.somaxconn=1024"  >> /etc/sysctl.conf
+#echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
+
+# TODO: Disable transparent hugepages
+#   grub2-editenv - list | grep kernelopts <- test for it
+#  grub2-editenv - set "$(grub2-editenv - list | grep kernelopts) transparent_hugepage=never"
+
 
 
 # Download NVT updates
 echo
-echo "Step 1: Update NVT, CERT, and SCAP data"
+echo "Update NVT, CERT, and SCAP data"
 echo "Please note this step could take some time."
 echo "Once completed, this will be updated automatically every 24 hours"
 echo
 
-echo "Select download method"
-echo
-echo "  * wget (NVT download only) "
-echo "  * curl (NVT download only) "
-echo "  * rsync"
-echo
-echo "  Note: If rsync requires a proxy, you should define that before this step."
-echo
-
-check_input "Downloader [Default: rsync]" "rsync|wget|curl" "rsync"
-if [ "$INPUTTEXT" == "wget" ]; then
-	DL_OPT="--wget"
-
-elif [ "$INPUTTEXT" == "curl" ]; then
-	DL_OPT="--curl"
-
-else
-	DL_OPT=""
-fi
-
+# TODO: do these need to go in as the openvas user?
 echo
 echo "Updating NVTs...." 
-download_update /usr/sbin/greenbone-nvt-sync $DL_OPT
+# TODO: Ok I must have messed up a directory or something, or maybe its OK? Its got subdirs
+# 
+download_update /usr/sbin/greenbone-nvt-sync 
 
 
 echo
 echo "Updating CERT data..."
-download_update /usr/sbin/greenbone-certdata-sync  $DL_OPT
+download_update /usr/sbin/greenbone-certdata-sync  
 
 
 echo
 echo "Updating SCAP data..."
-download_update /usr/sbin/greenbone-scapdata-sync $DL_OPT
+download_update /usr/sbin/greenbone-scapdata-sync 
 
-
+su - gvm -c "openvas --update-vt-info"
 
 
 # Handle certs
@@ -173,11 +187,6 @@ else
 fi
 echo
 
-
-#/usr/sbin/service openvas-scanner restart  >/dev/null 2>&1
-#echo -n "Pausing while openvas-scanner loads NVTs..."
-#sleep 10
-#echo "Done"
 
 # Start openvas manager, use rngd to speed up the key process
 if  [ -f /usr/sbin/rngd ]; then
@@ -196,22 +205,15 @@ yum -y install postgresql-server postgresql-contrib
 postgresql-setup initdb
 systemctl start postgresql
 
-#
-su - postgres -c "createuser -DRS root" 
-su - postgres -c "createdb -O root gvmd"
-#su - postgres
-# psql gvmd
+su - postgres -c "createuser -DRS gvm" 
+su - postgres -c "createdb -O gvm gvmd"
 su - postgres -c "psql gvmd -q --command='create role dba with superuser noinherit;'"
-su - postgres -c "psql gvmd -q --command='grant dba to root;'"
+su - postgres -c "psql gvmd -q --command='grant dba to gvm;'"
 su - postgres -c "psql gvmd -q --command='create extension \"uuid-ossp\";'"
-# grant dba to root;
-# create extension "uuid-ossp";
+su - postgres -c "psql gvmd -q --command='create extension \"pgcrypto\";'"
+systemctl restart postgresql
 
-# root role does not exist?
-# createuser root
-# createdb -O gvmd root
-
-# This service has issues
+# TODO: needed?
 /usr/sbin/service gvmd restart  >/dev/null 2>&1
 
 

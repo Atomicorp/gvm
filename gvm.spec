@@ -2,7 +2,7 @@
 
 
 Summary: The Open Vulnerability Assessment (OpenVAS) suite
-Name:    greenbone-vulnerability-manager
+Name:    gvm
 Version: 11.0.0
 Release: RELEASE-AUTO%{?dist}.art
 Source0: gvm-%{version}.tar.gz
@@ -20,8 +20,9 @@ Prefix: %{_prefix}
 BuildArch:      noarch
 Obsoletes: openvas
 Provides: openvas
-Provides: gvm
+Provides: greenbone-vulnerability-manager
 
+Requires: python3
 Requires: openvas-scanner
 #Requires: openvas-cli
 Requires: OSPd
@@ -86,8 +87,10 @@ openvas is a meta-package encompassing all of the components from OpenVAS.
 %install
 mkdir -p %{buildroot}/usr/bin/
 mkdir -p %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
+mkdir -p %{buildroot}/etc/sudoers.d/
 install -m0700 openvas-setup %{buildroot}/usr/bin/openvas-setup
 install -m0700 openvas-setup %{buildroot}/usr/bin/gvm-setup
+install -m0600 gvm.sudo %{buildroot}/etc/sudoers.d/gvm
 install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
 
 install -Dp -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-scap
