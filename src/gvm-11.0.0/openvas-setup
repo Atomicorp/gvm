@@ -77,13 +77,13 @@ SELINUX=$(getenforce 2>/dev/null)
 	fi
 fi
 
-# TODO: Python check
-alternatives --list |grep python
-
+#Python 
+alternatives --set python /usr/bin/python3
 
 # Set up postgres
 yum -y install postgresql-server postgresql-contrib
 postgresql-setup initdb
+systemctl enable postgresql
 systemctl start postgresql
 
 su - postgres -c "createuser -DRS gvm"
@@ -127,6 +127,10 @@ else
 	echo "db_address=/var/run/redis/redis.sock" >> /etc/openvas/openvas.conf
 fi
 
+if grep -q "^databases 512" $REDIS_CONF; then
+	sed -i "s/^databases.*/databases 512/g" $REDIS_CONF
+fi 
+
 # Add uer to redis socket
 if ! groups gvm |grep -q redis ; then
 	usermod -aG redis gvm
@@ -135,16 +139,21 @@ fi
 systemctl enable redis
 systemctl start redis
 
-# TODO: Fixing huge memory pages
-#sysctl -w net.core.somaxconn=1024
-#sysctl vm.overcommit_memory=1
+#Set sysctl
+sysctl -w net.core.somaxconn=1024
+sysctl vm.overcommit_memory=1
 #
-#echo "net.core.somaxconn=1024"  >> /etc/sysctl.conf
-#echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
+if ! grep -q "net.core.somaxconn=1024" /etc/sysctl.conf; then
+	echo "net.core.somaxconn=1024"  >> /etc/sysctl.conf
+fi
+if ! grep -q "vm.overcommit_memory=1" /etc/sysctl.conf; then
+	echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
+fi
 
-# TODO: Disable transparent hugepages
-#   grub2-editenv - list | grep kernelopts <- test for it
-#  grub2-editenv - set "$(grub2-editenv - list | grep kernelopts) transparent_hugepage=never"
+#Disable transparent hugepages
+if ! $(grub2-editenv - list | grep transparent_hugepage=never) ; then
+	grub2-editenv - set "$(grub2-editenv - list | grep kernelopts) transparent_hugepage=never"
+fi
 
 
 
@@ -155,11 +164,8 @@ echo "Please note this step could take some time."
 echo "Once completed, this will be updated automatically every 24 hours"
 echo
 
-# TODO: do these need to go in as the openvas user?
 echo
 echo "Updating NVTs...." 
-# TODO: Ok I must have messed up a directory or something, or maybe its OK? Its got subdirs
-# 
 download_update /usr/sbin/greenbone-nvt-sync 
 
 
@@ -178,9 +184,9 @@ su - gvm -c "openvas --update-vt-info"
 # Handle certs
 echo
 echo -n "Updating OpenVAS Manager certificates: "
-/usr/bin/gvm-manage-certs -V >/dev/null 2>&1
+su - gvm -c "/usr/bin/gvm-manage-certs -V >/dev/null 2>&1"
 if [ $? -ne 0 ]; then
-	/usr/bin/gvm-manage-certs -a  >/dev/null 2>&1
+	su - gvm -c "/usr/bin/gvm-manage-certs -a  >/dev/null 2>&1"
 	echo "Complete"
 else
 	echo "Already Exists"
@@ -188,38 +194,20 @@ fi
 echo
 
 
-# Start openvas manager, use rngd to speed up the key process
-if  [ -f /usr/sbin/rngd ]; then
-	pidof rngd > /dev/null
-	if [[ $? -ne 0 ]]; then
-		rngd -r /dev/urandom
-	fi
-fi
-
-if [  -f /var/lib/openvas/mgr/tasks.db ]; then
-	/usr/sbin/gvmd --migrate --progress 
-fi
-
-# Set up postgres
-yum -y install postgresql-server postgresql-contrib
-postgresql-setup initdb
-systemctl start postgresql
-
-su - postgres -c "createuser -DRS gvm" 
-su - postgres -c "createdb -O gvm gvmd"
-su - postgres -c "psql gvmd -q --command='create role dba with superuser noinherit;'"
-su - postgres -c "psql gvmd -q --command='grant dba to gvm;'"
-su - postgres -c "psql gvmd -q --command='create extension \"uuid-ossp\";'"
-su - postgres -c "psql gvmd -q --command='create extension \"pgcrypto\";'"
-systemctl restart postgresql
-
-# TODO: needed?
 /usr/sbin/service gvmd restart  >/dev/null 2>&1
 
+echo
+echo
+echo "GVMD startup can take some time to complete. Please be patient"
+echo
+echo -n "GVMD startup: "
+su - gvm -c "gvmd --get-scanners >/dev/null 2>&1"
+echo "Complete"
 
 
 
-if ! /usr/sbin/gvmd --get-users | grep -q ^admin$ ; then
+
+if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
 	# Configure Admin user
 	echo 
@@ -269,34 +257,20 @@ if ! /usr/sbin/gvmd --get-users | grep -q ^admin$ ; then
 
 
 	# Create admin user
-	/usr/sbin/gvmd  --create-user=$USERNAME >/dev/null 2>&1
-	/usr/sbin/gvmd  --user=$USERNAME --new-password=$PASSWORD
+	su - gvm -c "/usr/sbin/gvmd  --create-user=$USERNAME >/dev/null 2>&1"
+	su - gvm -c "/usr/sbin/gvmd  --user=$USERNAME --new-password=$PASSWORD"
 
 fi
+
+systemctl start gsad
+systemctl enable ospd-openvas
+systemctl enable gvmd
+systemctl enable gsad
 
 echo
 echo "Setup complete, you can now access GSAD at:"
 echo "  https://<IP>:9392"
 echo
-
-# Stop rngd
-if [ -f /usr/sbin/rngd ]; then
-	killall rngd
-fi
-
-service gsad restart
-
-# Add to startup for systemd based systems
-if [ -x /bin/systemctl ]; then
-	systemctl enable openvas-scanner
-	systemctl enable gvmd
-	if [ -f /lib/systemd/system/greenbone-security-assistant.service ]; then
-      		systemctl enable greenbone-security-assistant
-	else
-      		systemctl enable gsad
-	fi
-		
-fi
 
 # End
 

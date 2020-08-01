@@ -22,42 +22,23 @@ Obsoletes: openvas
 Provides: openvas
 Provides: greenbone-vulnerability-manager
 
+
 Requires: python3
 Requires: openvas-scanner
-#Requires: openvas-cli
 Requires: OSPd
 Requires: OSPd-openvas
-
-Requires: openvas-manager
+Requires: gvmd
 Requires: greenbone-security-assistant
 Requires: redis
 Requires: psmisc
-#Requires: OSPd-nmap
-
-# Support packages:
 Requires: nmap
-
-# Support packages
-#Requires: nikto
-#Requires: ncrack
-
-# Tmp, need to sort out alien and w3af for el6, and w3af for el7
-#if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
-##Requires: w3af
-#Requires: wapiti
-#Requires: alien
-#%endif
-#Requires: dirb
-
-Requires: haveged
-
-# not supported on fc27 now
-#Requires: ovaldi
+# move to script, this is from epel 
+#Requires: haveged
 Requires: gnutls-utils
 Requires: rng-tools
-
 Requires: bzip2
 
+Requires: openvas-smb
 
 %if  0%{!?rhel} >= 6
 # PDF reports
@@ -72,11 +53,10 @@ Requires: texlive-comment
 Requires: texlive-collection-latexextra
 %endif
 
-Requires: openvas-smb
  
 
 %description
-openvas is a meta-package encompassing all of the components from OpenVAS.
+Greenbone Vulnerability Manager (GVM) is a meta-package encompassing all of the components from OpenVAS/GVM.
 
 %prep
 
@@ -114,6 +94,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Aug 1 2020 Scott R. Shinn <scott@atomicorp.com> - 11.0.0-RELEASE-AUTO
+- Update loader for GVM/Openvas 11.0.0
+
 * Mon Apr 8 2019 Scott R. Shinn <scott@atomicorp.com> - 10.0.0-RELEASE-AUTO
 - Update loader for Openvas 10.0.0
 
