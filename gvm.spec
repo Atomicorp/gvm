@@ -106,7 +106,7 @@ rm -rf $RPM_BUILD_ROOT
 %license LICENSE
 /usr/bin/openvas-setup
 /usr/bin/gvm-setup
-#/usr/bin/openvas-check-setup
+/etc/sudoers.d/gvm
 /etc/cron.d/openvas-sync-scap
 /etc/cron.d/openvas-sync-cert
 /etc/cron.d/openvas-sync-nvt
