@@ -39,7 +39,7 @@ function download_update() {
 	OPTIONS=$2
 
 	while [ $DOWNLOAD_SUCCESS -lt 1 ]; do
-		if [ $RETRIES -gt 2 ]; then
+		if [ $RETRIES -gt 5 ]; then
 			echo "Download not successful: too many failed attempts"
 			echo "  rerun  $COMMAND manually"
 			return 
@@ -51,8 +51,8 @@ function download_update() {
 			echo "$COMMAND success"
 			DOWNLOAD_SUCCESS=1
 		else
-			echo "Retrying in 3 seconds..."
-			sleep 3
+			echo "Retrying in 60 seconds..."
+			sleep 60
 			RETRIES=$(( $RETRIES + 1 ))
 		fi
 	done
@@ -170,6 +170,11 @@ echo
 echo "Updating NVTs...." 
 download_update /usr/bin/greenbone-nvt-sync 
 
+if [ ! -f /var/lib/gvm/plugins/plugin_feed_info.inc ]; then
+	echo "Download must have failed, /var/lib/gvm/plugins/plugin_feed_info.inc not found"
+	echo "retrying"
+	download_update /usr/bin/greenbone-nvt-sync
+fi
 
 echo
 echo "Updating CERT data..."

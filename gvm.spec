@@ -69,10 +69,12 @@ Greenbone Vulnerability Manager (GVM) is a meta-package encompassing all of the 
 mkdir -p %{buildroot}/usr/bin/
 mkdir -p %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
 mkdir -p %{buildroot}/etc/sudoers.d/
+mkdir -p %{buildroot}/etc/cron.daily/
 install -m0700 openvas-setup %{buildroot}/usr/bin/openvas-setup
 install -m0700 openvas-setup %{buildroot}/usr/bin/gvm-setup
 install -m0600 gvm.sudo %{buildroot}/etc/sudoers.d/gvm
 install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
+install -m700 gvm.cron %{buildroot}/etc/cron.daily/gvm
 
 install -Dp -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-scap
 install -Dp -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-cert
