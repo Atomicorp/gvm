@@ -81,8 +81,9 @@ fi
 alternatives --set python /usr/bin/python3
 
 # Set up postgres
-if [ ! -d /var/lib/pgsql ]; then
-	postgresql-setup initdb
+if [ ! -f /var/lib/pgsql/initdb_postgresql.log ]; then
+	postgresql-setup --initdb --unit postgresql
+
 	systemctl enable postgresql
 	systemctl start postgresql
 
@@ -271,6 +272,12 @@ systemctl start gsad
 systemctl enable ospd-openvas
 systemctl enable gvmd
 systemctl enable gsad
+
+# Set firewall rules
+DEFAULT_ZONE=$(firewall-cmd --get-default-zone)
+firewall-cmd --zone=$DEFAULT_ZONE --permanent --add-service=https
+firewall-cmd --reload
+
 
 echo
 echo "Setup complete, you can now access GSAD at:"
