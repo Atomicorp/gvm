@@ -81,18 +81,19 @@ fi
 alternatives --set python /usr/bin/python3
 
 # Set up postgres
-yum -y install postgresql-server postgresql-contrib
-postgresql-setup initdb
-systemctl enable postgresql
-systemctl start postgresql
+if [ ! -d /var/lib/pgsql ]; then
+	postgresql-setup initdb
+	systemctl enable postgresql
+	systemctl start postgresql
 
-su - postgres -c "createuser -DRS gvm"
-su - postgres -c "createdb -O gvm gvmd"
-su - postgres -c "psql gvmd -q --command='create role dba with superuser noinherit;'"
-su - postgres -c "psql gvmd -q --command='grant dba to gvm;'"
-su - postgres -c "psql gvmd -q --command='create extension \"uuid-ossp\";'"
-su - postgres -c "psql gvmd -q --command='create extension \"pgcrypto\";'"
-systemctl restart postgresql
+	su - postgres -c "createuser -DRS gvm"
+	su - postgres -c "createdb -O gvm gvmd"
+	su - postgres -c "psql gvmd -q --command='create role dba with superuser noinherit;'"
+	su - postgres -c "psql gvmd -q --command='grant dba to gvm;'"
+	su - postgres -c "psql gvmd -q --command='create extension \"uuid-ossp\";'"
+	su - postgres -c "psql gvmd -q --command='create extension \"pgcrypto\";'"
+	systemctl restart postgresql
+fi
 
 
 
@@ -151,7 +152,7 @@ if ! grep -q "vm.overcommit_memory=1" /etc/sysctl.conf; then
 fi
 
 #Disable transparent hugepages
-if ! $(grub2-editenv - list | grep transparent_hugepage=never) ; then
+if ! $(grub2-editenv - list | grep -q transparent_hugepage=never) ; then
 	grub2-editenv - set "$(grub2-editenv - list | grep kernelopts) transparent_hugepage=never"
 fi
 
@@ -194,14 +195,18 @@ fi
 echo
 
 
-/usr/sbin/service gvmd restart  >/dev/null 2>&1
+# Start ospd
+systemctl start ospd-openvas
 
+
+systemctl start gvmd 
 echo
 echo
 echo "GVMD startup can take some time to complete. Please be patient"
 echo
 echo -n "GVMD startup: "
-su - gvm -c "gvmd --get-scanners >/dev/null 2>&1"
+# Need some function that says its started
+# teh gvmd test does work, but only once the nvti's are going in logs
 echo "Complete"
 
 

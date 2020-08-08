@@ -22,10 +22,11 @@ Obsoletes: openvas
 Provides: openvas
 Provides: greenbone-vulnerability-manager
 
-
+Requires: postgresql-server postgresql-contrib
 Requires: python3
 Requires: openvas-scanner
-Requires: OSPd
+# Manual building now
+#Requires: OSPd
 Requires: OSPd-openvas
 Requires: gvmd
 Requires: greenbone-security-assistant
