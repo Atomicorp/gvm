@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+
+su - gvm -c "/usr/bin/greenbone-nvt-sync"
+su - gvm -c "/usr/sbin/greenbone-certdata-sync"
+su - gvm -c "/usr/sbin/greenbone-scapdata-sync"
+su - gvm -c "openvas --update-vt-info"
+
+
