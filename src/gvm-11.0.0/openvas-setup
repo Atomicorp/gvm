@@ -166,7 +166,7 @@ echo
 
 echo
 echo "Updating NVTs...." 
-download_update /usr/sbin/greenbone-nvt-sync 
+download_update /usr/bin/greenbone-nvt-sync 
 
 
 echo
