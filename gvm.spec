@@ -6,10 +6,6 @@ Name:    gvm
 Version: 11.0.0
 Release: RELEASE-AUTO%{?dist}.art
 Source0: gvm-%{version}.tar.gz
-#Source1: http://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup
-Source2: openvas-scap-sync-cronjob
-Source3: openvas-cert-sync-cronjob
-Source4: openvas-nvt-sync-cronjob
 License: AGPL
 URL: http://www.openvas.org
 Vendor: Greenbone https://www.greenbone.net
@@ -76,9 +72,6 @@ install -m0600 gvm.sudo %{buildroot}/etc/sudoers.d/gvm
 install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
 install -m700 gvm.cron %{buildroot}/etc/cron.daily/gvm
 
-install -Dp -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-scap
-install -Dp -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-cert
-install -Dp -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/cron.d/openvas-sync-nvt
 
 
 %clean
@@ -90,9 +83,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/openvas-setup
 /usr/bin/gvm-setup
 /etc/sudoers.d/gvm
-/etc/cron.d/openvas-sync-scap
-/etc/cron.d/openvas-sync-cert
-/etc/cron.d/openvas-sync-nvt
+/etc/cron.daily/gvm
 /usr/share/licenses/greenbone-vulnerability-manager/LICENSE
 
 
