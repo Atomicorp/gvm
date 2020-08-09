@@ -285,8 +285,8 @@ firewall-cmd --reload
 
 
 echo
-echo "Setup complete, you can now access GSAD at:"
-echo "  https://<IP>:9392"
+echo "Setup complete"
+echo
 echo
 
 # End
