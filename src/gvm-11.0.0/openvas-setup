@@ -129,7 +129,7 @@ else
 	echo "db_address=/var/run/redis/redis.sock" >> /etc/openvas/openvas.conf
 fi
 
-if grep -q "^databases 512" $REDIS_CONF; then
+if ! grep -q "^databases 512" $REDIS_CONF; then
 	sed -i "s/^databases.*/databases 512/g" $REDIS_CONF
 fi 
 
