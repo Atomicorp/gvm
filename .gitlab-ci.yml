@@ -15,7 +15,7 @@ build-kali-x86_64:
     - cp *.spec ~/rpmbuild/SPECS/
     - rm -rf ~/rpmbuild/SOURCES/*
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
     - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
     - cp buildsys-tools/* ~/bin/
     - chmod +x ~/bin/build-debian.sh
@@ -35,7 +35,7 @@ build-xenial-x86_64:
     - cp *.spec ~/rpmbuild/SPECS/
     - rm -rf ~/rpmbuild/SOURCES/*
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
     - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
     - cp buildsys-tools/* ~/bin/
     - chmod +x ~/bin/build-debian.sh
@@ -44,20 +44,20 @@ build-xenial-x86_64:
     -  (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  dist=xenial arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-testing/debian/; else  dist=xenial arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-bleeding/debian/; fi )
 
 
-build-el7-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp *.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
-    
-
-  script:
-    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el7-x86_64 gvm.spec /mnt/repo/atomic-testing/centos/7/x86_64/ ; else  gitlab-build.sh el7-x86_64 gvm.spec /mnt/repo/atomic-bleeding/centos/7/x86_64/ ; fi )
-
+#build-el7-x86_64:
+#  stage: build
+#  before_script:
+#    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+#    - mkdir -p ~/mock
+#    - cp mock/* ~/mock/
+#    - cp *.spec ~/rpmbuild/SPECS/
+#    - cp SOURCES/* ~/rpmbuild/SOURCES/
+#    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
+#    
+#
+#  script:
+#    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el7-x86_64 gvm.spec /mnt/repo/atomic-testing/centos/7/x86_64/ ; else  gitlab-build.sh el7-x86_64 gvm.spec /mnt/repo/atomic-bleeding/centos/7/x86_64/ ; fi )
+#
 build-el8-x86_64:
   stage: prep
   before_script:
@@ -66,7 +66,7 @@ build-el8-x86_64:
     - cp mock/* ~/mock/
     - cp *.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
 
 
   script:
@@ -82,7 +82,7 @@ build-fc32-x86_64:
     - cp mock/* ~/mock/
     - cp gvm.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-11.0.0.tar.gz gvm-11.0.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
 
 
   script:
