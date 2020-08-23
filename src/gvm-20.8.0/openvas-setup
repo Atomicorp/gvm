@@ -4,10 +4,10 @@
 # https://www.atomicorp.com
 
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the Affero GNU General Public License 
+# it under the terms of the Affero GNU General Public License (AGPL)
 #
 
-VERSION=5.0.0
+VERSION=6.0.0
 
 # Functions
 
@@ -36,10 +36,11 @@ function download_update() {
 	RETRIES=0
 	DOWNLOAD_SUCCESS=0
 	COMMAND=$1
-	OPTIONS=$2
+	TEST=$2
+	MSG=$3
 	
 
-	echo "  $COMMAND"
+	echo "$COMMAND"
 
 	while [ $DOWNLOAD_SUCCESS -lt 1 ]; do
 		if [ $RETRIES -gt 5 ]; then
@@ -48,9 +49,9 @@ function download_update() {
 			return 
 		fi
 
-		su - gvm -c "$COMMAND $OPTIONS"
+		su - gvm -c "$COMMAND"
 
-		if [ $? -eq 0 ] ; then
+		if [ -f $TEST ] ; then
 			echo "$COMMAND success"
 			DOWNLOAD_SUCCESS=1
 		else
@@ -171,19 +172,20 @@ echo
 
 echo
 echo "Updating NVTs...." 
-download_update /usr/bin/greenbone-nvt-sync
+download_update /usr/bin/greenbone-nvt-sync /var/lib/gvm/plugins/plugin_feed_info.inc
 
 echo
 echo "Updating GVMD_DATA..."
-su - gvm -c "/usr/sbin/greenbone-feed-sync --type GVMD_DATA"
+download_update  "/usr/sbin/greenbone-feed-sync --type GVMD_DATA" /var/lib/gvm/data-objects/gvmd/timestamp
 
 echo
 echo "Updating CERT data..."
-su - gvm -c "/usr/sbin/greenbone-feed-sync --type SCAP"
+download_update "/usr/sbin/greenbone-feed-sync --type SCAP" /var/lib/gvm/scap-data/official-cpe-dictionary_v2.2.xml
+
 
 echo
 echo "Updating SCAP data..."
-su - gvm -c "/usr/sbin/greenbone-feed-sync --type CERT"
+download_update "/usr/sbin/greenbone-feed-sync --type CERT"  /var/lib/gvm/cert-data/timestamp
 
 
 su - gvm -c "openvas --update-vt-info"
