@@ -12,6 +12,7 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 
 * Redhat 8
 * Centos 8
+* Fedora 32
 * Docker
 
 
@@ -26,17 +27,23 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
     wget -q -O - https://updates.atomicorp.com/installers/atomic | sudo sh
 ```
 
-2) Install the openvas package
+2) Install the GVM/openvas package
 
 ```
-    yum install openvas
+	# Redhat/Centos 8 Only
+	yum config-manager --set-enabled PowerTools
+	yum install epel-release
+
+	# 
+	yum install gvm
 ```
 
 
 3) Configure openvas
 ```
-    openvas-setup
+    gvm-setup
 ```
+
 
 ## Docker Installation ##
 
@@ -55,4 +62,8 @@ The [Atomicorp Openvas Docker Project](https://github.com/atomicorp/openvas-dock
 * Jan-Oliver Wagner @Greenbone
 
 * Everyone at Greenbone that made this project possible
+
+* Fredrik Hilmersson https://libellux.com
+
+* Cody Woods @Atomicorp
 

@@ -37,6 +37,9 @@ function download_update() {
 	DOWNLOAD_SUCCESS=0
 	COMMAND=$1
 	OPTIONS=$2
+	
+
+	echo "  $COMMAND"
 
 	while [ $DOWNLOAD_SUCCESS -lt 1 ]; do
 		if [ $RETRIES -gt 5 ]; then
@@ -168,22 +171,20 @@ echo
 
 echo
 echo "Updating NVTs...." 
-download_update /usr/bin/greenbone-nvt-sync 
+download_update /usr/bin/greenbone-nvt-sync
 
-if [ ! -f /var/lib/gvm/plugins/plugin_feed_info.inc ]; then
-	echo "Download must have failed, /var/lib/gvm/plugins/plugin_feed_info.inc not found"
-	echo "retrying"
-	download_update /usr/bin/greenbone-nvt-sync
-fi
+echo
+echo "Updating GVMD_DATA..."
+su - gvm -c "/usr/sbin/greenbone-feed-sync --type GVMD_DATA"
 
 echo
 echo "Updating CERT data..."
-download_update /usr/sbin/greenbone-certdata-sync  
-
+su - gvm -c "/usr/sbin/greenbone-feed-sync --type SCAP"
 
 echo
 echo "Updating SCAP data..."
-download_update /usr/sbin/greenbone-scapdata-sync 
+su - gvm -c "/usr/sbin/greenbone-feed-sync --type CERT"
+
 
 su - gvm -c "openvas --update-vt-info"
 
@@ -211,11 +212,10 @@ echo
 echo "GVMD startup can take some time to complete. Please be patient"
 echo
 echo -n "GVMD startup: "
-# Need some function that says its started
-# teh gvmd test does work, but only once the nvti's are going in logs
+# TODO: Need some function that says its started
+# th gvmd test does work, but only once the nvti's are going in logs
+# this also needs to create the scan configs
 echo "Complete"
-
-
 
 
 if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
@@ -242,12 +242,10 @@ if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 	# Prompt the user for the desired password and verify its accuracy.  
 	PASSCONFIRMED=0
 	while [ $PASSCONFIRMED -lt 1 ]; do
-		echo -n "Enter Administrator Password: "
-		read PASSWORD 
+		read -s -p "Enter Administrator Password: " PASSWORD
 		echo
 
-		echo -n "Verify Administrator Password: "
-		read PASSWORD2 
+		read -s -p "Verify Administrator Password: " PASSWORD2
 		echo
 
 
@@ -268,8 +266,16 @@ if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
 
 	# Create admin user
-	su - gvm -c "/usr/sbin/gvmd  --create-user=$USERNAME >/dev/null 2>&1"
-	su - gvm -c "/usr/sbin/gvmd  --user=$USERNAME --new-password=$PASSWORD"
+	su - gvm -c "/usr/sbin/gvmd  --create-user=${USERNAME}>/dev/null 2>&1"
+	su - gvm -c "/usr/sbin/gvmd  --user=${USERNAME} --new-password=\"${PASSWORD}\""
+
+	# Set the feed owner
+	FEED_OWNER=$(su - gvm -c "/usr/sbin/gvmd --get-users --verbose" | awk '/^admin / {print $2}')
+	if [[ $FEED_OWNER == "" ]]; then
+		echo "Error: Feed owner could not be found"
+		exit 1
+	fi
+	su - gvm -c "/usr/sbin/gvmd --modify-setting 78eceaec-3385-11ea-b237-28d24461215b --value $FEED_OWNER"
 
 fi
 
