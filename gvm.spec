@@ -3,7 +3,7 @@
 
 Summary: The Open Vulnerability Assessment (OpenVAS) suite
 Name:    gvm
-Version: 11.0.0
+Version: 20.08
 Release: RELEASE-AUTO%{?dist}.art
 Source0: gvm-%{version}.tar.gz
 License: AGPL

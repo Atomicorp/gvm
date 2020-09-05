@@ -214,10 +214,15 @@ echo
 echo "GVMD startup can take some time to complete. Please be patient"
 echo
 echo -n "GVMD startup: "
-# TODO: Need some function that says its started
-# th gvmd test does work, but only once the nvti's are going in logs
-# this also needs to create the scan configs
-echo "Complete"
+tail -f /var/log/gvm/gvmd.log | while read LOGLINE; do
+	
+        if [[ "${LOGLINE}" == *"Report format XML"* ]]; then
+                echo "Complete"
+                break
+        else
+                echo -n .
+        fi
+done
 
 
 if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
