@@ -7,7 +7,7 @@
 # it under the terms of the Affero GNU General Public License (AGPL)
 #
 
-VERSION=6.0.0
+VERSION=6.0.1
 
 # Functions
 
@@ -43,7 +43,7 @@ function download_update() {
 	echo "$COMMAND"
 
 	while [ $DOWNLOAD_SUCCESS -lt 1 ]; do
-		if [ $RETRIES -gt 5 ]; then
+		if [ $RETRIES -gt 50 ]; then
 			echo "Download not successful: too many failed attempts"
 			echo "  rerun  $COMMAND manually"
 			return 
@@ -207,39 +207,37 @@ echo
 # Start ospd
 systemctl start ospd-openvas
 
-
+# Start gvmd
 systemctl start gvmd 
-echo
-echo
-echo "GVMD startup can take some time to complete. Please be patient"
-echo
-echo -n "GVMD startup: "
-tail -f /var/log/gvm/gvmd.log | while read LOGLINE; do
-	
-        if [[ "${LOGLINE}" == *"Report format XML"* ]]; then
-                echo "Complete"
-                break
-        else
-                echo -n .
-        fi
-done
+
+if [ ! -f /var/lib/gvm/data-objects/gvmd/timestamp ]; then
+        echo
+        echo "GVMD startup can take some time to complete. Please be patient"
+        echo
+        echo -n "GVMD startup: "
+        tail -f /var/log/gvm/gvmd.log | while read LOGLINE; do
+
+                if [[ "${LOGLINE}" == *"Updating VTs in database ... done"* ]]; then
+                        echo "Complete"
+                        break
+                else
+                        echo -n .
+                fi
+        done
+
+fi
 
 
 if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
 	# Configure Admin user
 	echo 
-	echo "Step 2: Choose the GSAD admin users password."
+	echo "Set the GSAD admin users password."
 	echo "The admin user is used to configure accounts,"
 	echo "Update NVT's manually, and manage roles."
 	echo 
 
-	echo -n "Enter administrator username [Default: admin] : "
-	read USERNAME
-
-	if [ "$USERNAME" == "" ]; then
-		USERNAME=admin
-	fi
+	USERNAME=admin
 
 	# Suppress output of password.
 	if [[ -t 0 ]]; then
