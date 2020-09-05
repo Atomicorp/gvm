@@ -1,7 +1,7 @@
 %define _prefix /usr
 
 
-Summary: The Open Vulnerability Assessment (OpenVAS) suite
+Summary: The Greenbone Vulnerability Management (GVM) suite
 Name:    gvm
 Version: 11.0.0
 Release: RELEASE-AUTO%{?dist}.art
@@ -16,7 +16,9 @@ Prefix: %{_prefix}
 BuildArch:      noarch
 Obsoletes: openvas
 Provides: openvas
+Obsoletes: greenbone-vulnerability-manager
 Provides: greenbone-vulnerability-manager
+Provides: greenbone-vulnerability-management
 
 Requires: postgresql-server postgresql-contrib
 Requires: python3
@@ -53,7 +55,7 @@ Requires: texlive-collection-latexextra
  
 
 %description
-Greenbone Vulnerability Manager (GVM) is a meta-package encompassing all of the components from OpenVAS/GVM.
+Greenbone Vulnerability Management (GVM) is a meta-package encompassing all of the components from GVM including OpenVAS.
 
 %prep
 
@@ -63,13 +65,13 @@ Greenbone Vulnerability Manager (GVM) is a meta-package encompassing all of the 
 
 %install
 mkdir -p %{buildroot}/usr/bin/
-mkdir -p %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
+mkdir -p %{buildroot}/usr/share/licenses/greenbone-vulnerability-management/
 mkdir -p %{buildroot}/etc/sudoers.d/
 mkdir -p %{buildroot}/etc/cron.daily/
 install -m0700 openvas-setup %{buildroot}/usr/bin/openvas-setup
 install -m0700 openvas-setup %{buildroot}/usr/bin/gvm-setup
 install -m0600 gvm.sudo %{buildroot}/etc/sudoers.d/gvm
-install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-manager/
+install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-management/
 install -m700 gvm.cron %{buildroot}/etc/cron.daily/gvm
 
 
@@ -84,7 +86,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/gvm-setup
 /etc/sudoers.d/gvm
 /etc/cron.daily/gvm
-/usr/share/licenses/greenbone-vulnerability-manager/LICENSE
+/usr/share/licenses/greenbone-vulnerability-management/LICENSE
 
 
 %changelog
