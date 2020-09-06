@@ -179,12 +179,12 @@ echo "Updating GVMD_DATA..."
 download_update  "/usr/sbin/greenbone-feed-sync --type GVMD_DATA" /var/lib/gvm/data-objects/gvmd/timestamp
 
 echo
-echo "Updating CERT data..."
+echo "Updating SCAP data..."
 download_update "/usr/sbin/greenbone-feed-sync --type SCAP" /var/lib/gvm/scap-data/official-cpe-dictionary_v2.2.xml
 
 
 echo
-echo "Updating SCAP data..."
+echo "Updating CERT data..."
 download_update "/usr/sbin/greenbone-feed-sync --type CERT"  /var/lib/gvm/cert-data/timestamp
 
 
@@ -211,6 +211,14 @@ systemctl start ospd-openvas
 systemctl start gvmd 
 
 if [ ! -f /var/lib/gvm/data-objects/gvmd/timestamp ]; then
+	echo "Error: GVMD Private data not found. "
+	echo "  exiting..."
+	exit 1
+fi
+
+
+if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
+
         echo
         echo "GVMD startup can take some time to complete. Please be patient"
         echo
@@ -225,10 +233,6 @@ if [ ! -f /var/lib/gvm/data-objects/gvmd/timestamp ]; then
                 fi
         done
 
-fi
-
-
-if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
 	# Configure Admin user
 	echo 
