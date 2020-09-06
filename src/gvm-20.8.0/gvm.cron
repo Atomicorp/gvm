@@ -2,6 +2,7 @@
 
 
 
+su - gvm -c "/usr/bin/greenbone-nvt-sync"
 su - gvm -c "/usr/sbin/greenbone-feed-sync --type GVMD_DATA"
 su - gvm -c "/usr/sbin/greenbone-feed-sync --type SCAP"
 su - gvm -c "/usr/sbin/greenbone-feed-sync --type CERT"
