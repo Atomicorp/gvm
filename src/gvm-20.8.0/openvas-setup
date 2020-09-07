@@ -217,21 +217,16 @@ if [ ! -f /var/lib/gvm/data-objects/gvmd/timestamp ]; then
 fi
 
 
+echo -n "GVMD startup: "
+until $(su - gvm -c "/usr/sbin/gvmd --get-users" >/dev/null 2>&1); do
+ 	echo -n .
+        sleep 3 
+done    
+echo Done
+
 if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
-        echo
-        echo "GVMD startup can take some time to complete. Please be patient"
-        echo
-        echo -n "GVMD startup: "
-        tail -f /var/log/gvm/gvmd.log | while read LOGLINE; do
 
-                if [[ "${LOGLINE}" == *"Updating VTs in database ... done"* ]]; then
-                        echo "Complete"
-                        break
-                else
-                        echo -n .
-                fi
-        done
 
 
 	# Configure Admin user
@@ -298,9 +293,35 @@ DEFAULT_ZONE=$(firewall-cmd --get-default-zone)
 firewall-cmd --zone=$DEFAULT_ZONE --permanent --add-service=https
 firewall-cmd --reload
 
+# Planned, this is not multi-run safe yet
+#if ! grep -q "Updating CERT info succeeded" /var/log/gvm/gvmd.log; then
+#	echo "GVMD startup can take some time to complete. Please be patient"
+#	echo
+#	echo -n "GVMD initializing: "
+#	COUNTER=0
+#	tail -f /var/log/gvm/gvmd.log | while read LOGLINE; do
+#		if [ $COUNTER -ge 600 ]; then
+#			echo "Error: gvmd startup was not detected successfully"
+#			echo "  exiting..."
+#			exit 1
+#		 fi
+#
+#		 if [[ "${LOGLINE}" == *"sync_cert: Updating CERT info succeeded"* ]]; then
+#			echo "Complete"
+#			break
+#		 else
+#			echo -n .
+#		 fi
+#
+#		((COUNTER++))
+#	done
+#fi
+
+
 
 echo
 echo "Setup complete"
+echo "  Log in to GSAD at https://localhost"
 echo
 echo
 
