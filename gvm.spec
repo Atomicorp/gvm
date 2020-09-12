@@ -20,6 +20,7 @@ Obsoletes: greenbone-vulnerability-manager
 Provides: greenbone-vulnerability-manager
 Provides: greenbone-vulnerability-management
 
+Requires:  texlive-collection-fontsrecommended texlive-collection-latexrecommended texlive-changepage texlive-titlesec
 Requires: postgresql-server postgresql-contrib
 Requires: python3
 Requires: openvas-scanner
@@ -68,12 +69,17 @@ mkdir -p %{buildroot}/usr/bin/
 mkdir -p %{buildroot}/usr/share/licenses/greenbone-vulnerability-management/
 mkdir -p %{buildroot}/etc/sudoers.d/
 mkdir -p %{buildroot}/etc/cron.daily/
+mkdir -p %{buildroot}/usr/share/texlive/texmf-local/tex/latex/comment
 install -m0700 openvas-setup %{buildroot}/usr/bin/openvas-setup
 install -m0700 openvas-setup %{buildroot}/usr/bin/gvm-setup
 install -m0600 gvm.sudo %{buildroot}/etc/sudoers.d/gvm
 install -m0644 LICENSE %{buildroot}/usr/share/licenses/greenbone-vulnerability-management/
 install -m700 gvm.cron %{buildroot}/etc/cron.daily/gvm
+install -m0644 comment.sty %{buildroot}/usr/share/texlive/texmf-local/tex/latex/comment/comment.sty
 
+
+%post
+/usr/bin/texhash >/dev/null 2>&1 ||: 
 
 
 %clean
@@ -90,6 +96,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Sep 12 2020 Scott R. Shinn <scott@atomicorp.com> - 20.08.0-RELEASE-AUTO
+- Add fixes for pdf generation
+
 * Sat Aug 1 2020 Scott R. Shinn <scott@atomicorp.com> - 11.0.0-RELEASE-AUTO
 - Update loader for GVM/Openvas 11.0.0
 
