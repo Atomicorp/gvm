@@ -93,6 +93,8 @@ rm -rf $RPM_BUILD_ROOT
 /etc/sudoers.d/gvm
 /etc/cron.daily/gvm
 /usr/share/licenses/greenbone-vulnerability-management/LICENSE
+/usr/share/texlive/texmf-local/tex/latex/comment/comment.sty
+
 
 
 %changelog
