@@ -54,6 +54,10 @@ The [Atomicorp Openvas Docker Project](https://github.com/atomicorp/openvas-dock
 ```
 
 
+## Join us on Slack ##
+
+Need help? Want to collaborate?  Request an invite: slack@ossec.net
+
 
 ## Credits and Thanks ##
 
