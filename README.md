@@ -31,7 +31,7 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 
 ```
 	# Redhat/Centos 8 Only
-	yum config-manager --set-enabled PowerTools
+	yum config-manager --set-enabled powertools
 	yum install epel-release
 
 	# 
