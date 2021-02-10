@@ -7,7 +7,7 @@
 # it under the terms of the Affero GNU General Public License (AGPL)
 #
 
-VERSION=6.0.2
+VERSION=6.0.3
 
 # Functions
 
@@ -283,7 +283,16 @@ if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
 fi
 
+
+# The default timeout for web sessions is only 15 minutes
+# ExecStart in /usr/lib/systemd/system/gsad.service reads in the OPTIONS paramter from /etc/sysconfig/gsad
+# Increase the timeout to 24 hours via --timeout=1440
+sed -i 's/OPTIONS="/OPTIONS="--timeout=1440 /g' /etc/sysconfig/gsad
+
+# Start gsad
 systemctl start gsad
+
+
 systemctl enable ospd-openvas
 systemctl enable gvmd
 systemctl enable gsad
