@@ -72,20 +72,20 @@ build-el8-x86_64:
   script:
     - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-testing/centos/8/x86_64/ ; else  gitlab-build.sh el8-x86_64 gvm.spec /mnt/repo/atomic-bleeding/centos/8/x86_64/ ; fi )
 
-build-fc32-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp gvm.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
-
-
-  script:
-    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc32-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/32/x86_64 ; else  gitlab-build.sh fc32-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/32/x86_64 ; fi )
-
+#build-fc32-x86_64:
+#  stage: build
+#  before_script:
+#    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+#    - mkdir -p ~/mock
+#    - cp mock/* ~/mock/
+#    - cp gvm.spec ~/rpmbuild/SPECS/
+#    - cp SOURCES/* ~/rpmbuild/SOURCES/
+#    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
+#
+#
+#  script:
+#    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc32-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/32/x86_64 ; else  gitlab-build.sh fc32-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/32/x86_64 ; fi )
+#
 
 
 build-fc33-x86_64:

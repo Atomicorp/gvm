@@ -3,7 +3,7 @@
 
 Summary: The Greenbone Vulnerability Management (GVM) suite
 Name:    gvm
-Version: 20.08
+Version: 21.04
 Release: RELEASE-AUTO%{?dist}.art
 Source0: gvm-%{version}.tar.gz
 License: AGPL
@@ -37,8 +37,9 @@ Requires: nmap
 Requires: gnutls-utils
 Requires: rng-tools
 Requires: bzip2
-
 Requires: openvas-smb
+# possibly fixes something
+Requires: perl-XML-Twig
 
 %if  0%{!?rhel} >= 6
 # PDF reports
