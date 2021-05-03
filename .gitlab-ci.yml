@@ -7,41 +7,22 @@ stages:
 
 # Ubuntu 16
 # EOL: 04/01/2021
-build-kali-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - rm -rf ~/rpmbuild/BUILD/* || true
-    - cp *.spec ~/rpmbuild/SPECS/
-    - rm -rf ~/rpmbuild/SOURCES/*
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
-    - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
-    - cp buildsys-tools/* ~/bin/
-    - chmod +x ~/bin/build-debian.sh
+#build-kali-x86_64:
+#  stage: build
+#  before_script:
+#    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+#    - rm -rf ~/rpmbuild/BUILD/* || true
+#    - cp *.spec ~/rpmbuild/SPECS/
+#    - rm -rf ~/rpmbuild/SOURCES/*
+#    - cp SOURCES/* ~/rpmbuild/SOURCES/
+#    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
+#    - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
+#    - cp buildsys-tools/* ~/bin/
+#    - chmod +x ~/bin/build-debian.sh
+#
+#  script:
+#    -  (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  dist=kali arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-testing/debian/; else  dist=kali arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-bleeding/debian/; fi )
 
-  script:
-    -  (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  dist=kali arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-testing/debian/; else  dist=kali arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-bleeding/debian/; fi )
-
-
-
-# Ubuntu 16
-# EOL: 04/01/2021
-build-xenial-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - rm -rf ~/rpmbuild/BUILD/* || true
-    - cp *.spec ~/rpmbuild/SPECS/
-    - rm -rf ~/rpmbuild/SOURCES/*
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
-    - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
-    - cp buildsys-tools/* ~/bin/
-    - chmod +x ~/bin/build-debian.sh
-
-  script:
-    -  (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  dist=xenial arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-testing/debian/; else  dist=xenial arch=amd64 ~/bin/build-debian.sh -b gvm.spec /mnt/repo/atomic-bleeding/debian/; fi )
 
 
 #build-el7-x86_64:
@@ -120,10 +101,10 @@ build-fc34-x86_64:
 
 
 
-test-el7-x86_65:
-  stage: test
-  script: 
-    #- cd tests && docker build --build-arg HTTP_PROXY=http://10.66.6.1:3128 --build-arg http_proxy=http://10.66.6.1:3128  --build-arg RSYNC_PROXY=10.66.6.1:3128 .
-    - cd tests && docker build  .
+#test-el7-x86_65:
+#  stage: test
+#  script: 
+#    #- cd tests && docker build --build-arg HTTP_PROXY=http://10.66.6.1:3128 --build-arg http_proxy=http://10.66.6.1:3128  --build-arg RSYNC_PROXY=10.66.6.1:3128 .
+#    - cd tests && docker build  .
 
 
