@@ -38,8 +38,7 @@ Requires: gnutls-utils
 Requires: rng-tools
 Requires: bzip2
 Requires: openvas-smb
-# possibly fixes something
-Requires: perl-XML-Twig
+
 
 %if  0%{!?rhel} >= 6
 # PDF reports
@@ -52,6 +51,8 @@ Requires: texlive-texmf-latex
 %if 0%{?fedora} >= 21
 Requires: texlive-comment
 Requires: texlive-collection-latexextra
+# This may fix some disk space issues, but is not available on el8
+Requires: perl-XML-Twig
 %endif
 
  
