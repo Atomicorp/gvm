@@ -5,7 +5,7 @@ Summary: The Greenbone Vulnerability Management (GVM) suite
 Name:    gvm
 Version: 21.04
 Release: RELEASE-AUTO%{?dist}.art
-Source0: gvm-%{version}.tar.gz
+Source0: gvm.tar.gz
 License: AGPL
 URL: http://www.openvas.org
 Vendor: Greenbone https://www.greenbone.net
@@ -61,7 +61,7 @@ Greenbone Vulnerability Management (GVM) is a meta-package encompassing all of t
 
 %prep
 
-%autosetup  -n gvm-%{version}
+%autosetup  -n gvm
 
 %build
 

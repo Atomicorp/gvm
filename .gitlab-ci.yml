@@ -47,7 +47,7 @@ build-el8-x86_64:
     - cp mock/* ~/mock/
     - cp *.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
 
 
   script:
@@ -77,7 +77,7 @@ build-fc33-x86_64:
     - cp mock/* ~/mock/
     - cp gvm.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
 
 
   script:
@@ -92,7 +92,7 @@ build-fc34-x86_64:
     - cp mock/* ~/mock/
     - cp gvm.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm-20.8.0.tar.gz gvm-20.8.0/ && cd ..
+    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
 
 
   script:
