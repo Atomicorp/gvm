@@ -1,20 +1,19 @@
 # GVM / Openvas Packaging Project 
 
-The Openvas packaging project is an Atomicorp designed project to install and configure the [Openvas](http://www.openvas.org) vulnerability scanner Version 20.08 on a Redhat, Centos or Fedora system.
-
+The GVM (Formerly: Openvas) project is an Atomicorp designed effort to install and configure the [Openvas](http://www.openvas.org) vulnerability scanner Version 21.04 on a Redhat, Rocky, Centos or Fedora Linux platforms.
 
 
 Visit our website for the latest information.  [www.atomicorp.com](http://www.atomicorp.com)
 
 
-
 ## Currently Supported Platforms 
 
 * Redhat 8
+* Rocky 8
 * Centos 8
-* Fedora 32
+* Fedora 33
+* Fedora 34
 * Docker
-
 
 
 
@@ -30,8 +29,8 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 2) Install the GVM/openvas package
 
 ```
-	# Redhat/Centos 8 Only
-	yum config-manager --set-enabled PowerTools
+	# Redhat/Rocky/Centos 8 Only
+	yum config-manager --set-enabled powertools
 	yum install epel-release
 
 	# 
@@ -69,5 +68,5 @@ Need help? Want to collaborate?  Request an invite: slack@ossec.net
 
 * Fredrik Hilmersson https://libellux.com
 
-* Cody Woods @Atomicorp
+* Cody Woods @hcw2016
 
