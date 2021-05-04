@@ -1,8 +1,8 @@
 #!/bin/bash
-
+#
 # Author: Scott R. Shinn <scott@atomicorp.com>
 # https://www.atomicorp.com
-
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the Affero GNU General Public License (AGPL)
 #
@@ -65,7 +65,10 @@ function download_update() {
 
 
 echo
+echo "#####################################"
 echo "GVM Setup, Version: $VERSION"
+echo "Atomicorp, Inc."
+echo "#####################################"
 echo 
 
 # Test for selinux
@@ -320,8 +323,11 @@ firewall-cmd --reload
 
 
 echo
+echo
+echo "#####################################"
 echo "Setup complete"
 echo "  Log in to GSAD at https://localhost"
+echo "#####################################"
 echo
 echo
 
