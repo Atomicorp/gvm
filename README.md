@@ -13,6 +13,7 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 * Centos 8
 * Fedora 33
 * Fedora 34
+* Fedora 35
 * Docker
 
 
