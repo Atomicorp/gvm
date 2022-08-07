@@ -112,7 +112,6 @@ build-fc36-x86_64:
 
   script:
     - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc36-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/36/x86_64 ; else  gitlab-build.sh fc36-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/36/x86_64 ; fi )
-    - exit 1
 
 
 
