@@ -53,7 +53,6 @@ build-el9-x86_64:
 
   script:
     - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh el9-x86_64 gvm.spec /mnt/repo/atomic-testing/rocky/9/x86_64/ ; else  gitlab-build.sh el9-x86_64 gvm.spec /mnt/repo/atomic-bleeding/rocky/9/x86_64/ ; fi )
-    - exit 1
 
 
 build-el8-x86_64:
@@ -85,35 +84,6 @@ build-el8-x86_64:
 #    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc32-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/32/x86_64 ; else  gitlab-build.sh fc32-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/32/x86_64 ; fi )
 #
 
-
-build-fc33-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp gvm.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
-
-
-  script:
-    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc33-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/33/x86_64 ; else  gitlab-build.sh fc33-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/33/x86_64 ; fi )
-
-
-build-fc34-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp gvm.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
-
-
-  script:
-    - (if [[ $CI_BUILD_REF_NAME == "master" ]]; then  gitlab-build.sh fc34-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/34/x86_64 ; else  gitlab-build.sh fc34-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/34/x86_64 ; fi )
 
 build-fc35-x86_64:
   stage: build
