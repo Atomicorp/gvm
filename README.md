@@ -8,13 +8,11 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 
 ## Currently Supported Platforms 
 
-* Redhat 8
-* Rocky 8
-* Centos 8
-* Fedora 33
+* Redhat 8/9
+* Rocky 8/9
 * Fedora 34
 * Fedora 35
-* Docker
+* Fedora 36
 
 
 
@@ -32,6 +30,10 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 ```
 	# Redhat/Rocky/Centos 8 Only
 	yum config-manager --set-enabled powertools
+	yum install epel-release
+
+	# Redhat/Rocky 9 Only
+	yum config-manager --set-enabled crb
 	yum install epel-release
 
 	# 

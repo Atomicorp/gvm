@@ -7,7 +7,8 @@
 # it under the terms of the Affero GNU General Public License (AGPL)
 #
 
-VERSION=6.0.2
+VERSION=6.1.0
+GVM_VERSION=22.04
 
 # Functions
 
@@ -100,6 +101,7 @@ if [ ! -f /var/lib/pgsql/initdb_postgresql.log ]; then
 	su - postgres -c "psql gvmd -q --command='grant dba to gvm;'"
 	su - postgres -c "psql gvmd -q --command='create extension \"uuid-ossp\";'"
 	su - postgres -c "psql gvmd -q --command='create extension \"pgcrypto\";'"
+	su - postgres -c "psql gvmd -q --command='create extension \"pg-gvm\";'"
 	systemctl restart postgresql
 fi
 
@@ -179,7 +181,7 @@ download_update /usr/bin/greenbone-nvt-sync /var/lib/gvm/plugins/plugin_feed_inf
 
 echo
 echo "Updating GVMD_DATA..."
-download_update  "/usr/sbin/greenbone-feed-sync --type GVMD_DATA" /var/lib/gvm/data-objects/gvmd/timestamp
+download_update  "/usr/sbin/greenbone-feed-sync --type GVMD_DATA" /var/lib/gvm/data-objects/gvmd/${GVM_VERSION}/timestamp
 
 echo
 echo "Updating SCAP data..."
@@ -213,7 +215,7 @@ systemctl start ospd-openvas
 # Start gvmd
 systemctl start gvmd 
 
-if [ ! -f /var/lib/gvm/data-objects/gvmd/timestamp ]; then
+if [ ! -f /var/lib/gvm/data-objects/gvmd/${GVM_VERSION}/timestamp ]; then
 	echo "Error: GVMD Private data not found. "
 	echo "  exiting..."
 	exit 1

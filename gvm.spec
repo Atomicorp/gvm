@@ -3,7 +3,7 @@
 
 Summary: The Greenbone Vulnerability Management (GVM) suite
 Name:    gvm
-Version: 21.04
+Version: 22.04
 Release: RELEASE-AUTO%{?dist}.art
 Source0: gvm.tar.gz
 License: AGPL
@@ -20,6 +20,8 @@ Obsoletes: greenbone-vulnerability-manager
 Provides: greenbone-vulnerability-manager
 Provides: greenbone-vulnerability-management
 
+
+Requires: pg-gvm
 Requires:  texlive-collection-fontsrecommended texlive-collection-latexrecommended texlive-changepage texlive-titlesec
 Requires: postgresql-server postgresql-contrib
 Requires: python3
