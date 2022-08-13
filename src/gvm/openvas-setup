@@ -288,10 +288,19 @@ if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
 fi
 
+# Mosquitto setup
+if ! grep -q mqtt_server_uri /etc/openvas/openvas.conf; then
+	echo "mqtt_server_uri = localhost:1883" >> /etc/openvas/openvas.conf
+fi
+
+systemctl start mosquitto
 systemctl start gsad
+systemctl start notus-scanner
 systemctl enable ospd-openvas
+systemctl enable notus-scanner
 systemctl enable gvmd
 systemctl enable gsad
+systemctl enable mosquitto
 
 # Set firewall rules
 DEFAULT_ZONE=$(firewall-cmd --get-default-zone)

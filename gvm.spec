@@ -21,6 +21,7 @@ Provides: greenbone-vulnerability-manager
 Provides: greenbone-vulnerability-management
 
 
+Requires: mosquitto
 Requires: pg-gvm
 Requires:  texlive-collection-fontsrecommended texlive-collection-latexrecommended texlive-changepage texlive-titlesec
 Requires: postgresql-server postgresql-contrib

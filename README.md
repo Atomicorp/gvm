@@ -10,7 +10,6 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 
 * Redhat 8/9
 * Rocky 8/9
-* Fedora 34
 * Fedora 35
 * Fedora 36
 
