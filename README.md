@@ -8,10 +8,10 @@ Visit our website for the latest information.  [www.atomicorp.com](http://www.at
 
 ## Currently Supported Platforms 
 
-* Redhat 8/9
+* RHEL 8/9
 * Rocky 8/9
-* Fedora 35
 * Fedora 36
+* Fedora 37
 
 
 
@@ -57,7 +57,9 @@ The [Atomicorp Openvas Docker Project](https://github.com/atomicorp/openvas-dock
 
 ## Join us on Slack ##
 
-Need help? Want to collaborate?  Request an invite: slack@ossec.net
+Need help? Want to collaborate? 
+
+[Join Atomicorp Slack](https://atomicorp-support.slack.com/)
 
 
 ## Credits and Thanks ##
