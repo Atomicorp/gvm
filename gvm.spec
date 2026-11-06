@@ -3,7 +3,7 @@
 
 Summary: The Greenbone Vulnerability Management (GVM) suite
 Name:    gvm
-Version: 22.04
+Version: 26.43.0
 Release: RELEASE-AUTO%{?dist}.art
 Source0: gvm.tar.gz
 License: AGPL
@@ -41,6 +41,7 @@ Requires: gnutls-utils
 Requires: rng-tools
 Requires: bzip2
 Requires: openvas-smb
+Requires: greenbone-feed-sync
 # possibly fixes something
 Requires: perl-XML-Twig
 
@@ -102,6 +103,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Nov 6 2026 Scott R. Shinn <scott@atomicorp.com> - 26.43.0-RELEASE-AUTO
+- Track the 26.43 manager line
+- Sync feeds with greenbone-feed-sync
+
 * Sat Sep 12 2020 Scott R. Shinn <scott@atomicorp.com> - 20.08.0-RELEASE-AUTO
 - Add fixes for pdf generation
 
