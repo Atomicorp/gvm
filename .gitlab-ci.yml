@@ -1,41 +1,53 @@
 stages:
-  - build
+  - packaging
 
-build-el10-x86_64:
-  stage: build
+.package_template: &package_definition
+  stage: packaging
   before_script:
     - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
     - mkdir -p ~/mock
     - cp mock/* ~/mock/
+    - git clone https://gitlab.dev.atomicorp.com/atomicrocketturtle/buildsys-tools
+    - cp buildsys-tools/* ~/bin/
     - cp gvm.spec ~/rpmbuild/SPECS/
     - cp SOURCES/* ~/rpmbuild/SOURCES/ || true
     - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
-
   script:
-    - (if [[ $CI_COMMIT_REF_NAME == "master" ]]; then  gitlab-build.sh el10-x86_64 gvm.spec /mnt/repo/atomic-testing/rocky/10/x86_64/ ; else  gitlab-build.sh el10-x86_64 gvm.spec /mnt/repo/atomic-bleeding/rocky/10/x86_64/ ; fi )
+    - |
+      # el10 and Fedora use the 2026 signing key
+      if [[ ${DIST} == el8* || ${DIST} == el9* ]]; then
+        export SIGNING_KEY_NAME="legacy"
+        export SIGNING_KEY_FILE="RPM-GPG-KEY.atomicorp.txt"
+      else
+        export SIGNING_KEY_NAME="modern"
+        export SIGNING_KEY_FILE="RPM-GPG-KEY.atomicorp.2026.txt"
+      fi
 
-build-fc44-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp gvm.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/ || true
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
+      BUILD_SCRIPT="gitlab-build-5.sh"
 
-  script:
-    - (if [[ $CI_COMMIT_REF_NAME == "master" ]]; then  gitlab-build.sh fc44-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/44/x86_64/ ; else  gitlab-build.sh fc44-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/44/x86_64/ ; fi )
+      if [[ $CI_COMMIT_REF_NAME == "master" ]]; then
+        ${BUILD_SCRIPT} ${DIST} gvm.spec ${REPO_PATH_ATOMIC_TESTING} --build-package
+      else
+        ${BUILD_SCRIPT} ${DIST} gvm.spec ${REPO_PATH_ATOMIC_BLEEDING} --build-package
+      fi
 
-build-fc45-x86_64:
-  stage: build
-  before_script:
-    - mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    - mkdir -p ~/mock
-    - cp mock/* ~/mock/
-    - cp gvm.spec ~/rpmbuild/SPECS/
-    - cp SOURCES/* ~/rpmbuild/SOURCES/ || true
-    - cd src/ && tar zcvf ~/rpmbuild/SOURCES/gvm.tar.gz gvm/ && cd ..
+el10-x86_64:
+  <<: *package_definition
+  variables:
+    DIST: el10-x86_64
+    REPO_PATH_ATOMIC_TESTING: /mnt/repo/atomic-testing/rocky/10/x86_64/
+    REPO_PATH_ATOMIC_BLEEDING: /mnt/repo/atomic-bleeding/rocky/10/x86_64/
 
-  script:
-    - (if [[ $CI_COMMIT_REF_NAME == "master" ]]; then  gitlab-build.sh fc45-x86_64 gvm.spec /mnt/repo/atomic-testing/fedora/45/x86_64/ ; else  gitlab-build.sh fc45-x86_64 gvm.spec /mnt/repo/atomic-bleeding/fedora/45/x86_64/ ; fi )
+fc44-x86_64:
+  <<: *package_definition
+  variables:
+    DIST: fc44-x86_64
+    REPO_PATH_ATOMIC_TESTING: /mnt/repo/atomic-testing/fedora/44/x86_64/
+    REPO_PATH_ATOMIC_BLEEDING: /mnt/repo/atomic-bleeding/fedora/44/x86_64/
+
+fc45-x86_64:
+  <<: *package_definition
+  variables:
+    DIST: fc45-x86_64
+    REPO_PATH_ATOMIC_TESTING: /mnt/repo/atomic-testing/fedora/45/x86_64/
+    REPO_PATH_ATOMIC_BLEEDING: /mnt/repo/atomic-bleeding/fedora/45/x86_64/
