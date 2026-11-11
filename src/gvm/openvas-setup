@@ -7,8 +7,8 @@
 # it under the terms of the Affero GNU General Public License (AGPL)
 #
 
-VERSION=6.1.0
-GVM_VERSION=22.04
+VERSION=6.2.0
+GVM_VERSION=26.43
 
 # Functions
 
@@ -52,7 +52,7 @@ function download_update() {
 
 		su - gvm -c "$COMMAND"
 
-		if [ -f $TEST ] ; then
+		if compgen -G "$TEST" > /dev/null 2>&1 || [ -e "$TEST" ]; then
 			echo "$COMMAND success"
 			DOWNLOAD_SUCCESS=1
 		else
@@ -76,26 +76,43 @@ echo
 if [ -f /usr/sbin/getenforce ]; then
 SELINUX=$(getenforce 2>/dev/null)
 	if [ $? -eq 0 ] ; then
-		if [ "$SELINUX" != "Disabled" ]; then
+		if [ "$SELINUX" != "Disabled" ] && [ "$SELINUX" != "Permissive" ]; then
 			echo "Error: Selinux is set to ($SELINUX)"
-			echo "  selinux must be disabled in order to use openvas"
+			echo "  selinux must be disabled or permissive in order to use openvas"
 			echo "  exiting...."
 			exit 1
 		fi
 	fi
 fi
 
-#Python 
-alternatives --set python /usr/bin/python3
+# Ensure gvm system user exists and has a login shell for setup commands
+if ! id gvm >/dev/null 2>&1; then
+	useradd -r -m -d /var/lib/gvm -s /bin/bash -c "GVM (OpenVAS) User" gvm
+else
+	usermod -s /bin/bash gvm 2>/dev/null || true
+fi
+
+# Ensure directories exist with proper ownership
+mkdir -p /var/lib/gvm /var/lib/openvas /var/log/gvm /var/lib/notus /etc/openvas
+chown -R gvm:gvm /var/lib/gvm /var/lib/openvas /var/log/gvm /var/lib/notus 2>/dev/null || true
+
+# Python 
+if alternatives --list 2>/dev/null | grep -q '^python\b'; then
+	alternatives --set python /usr/bin/python3 2>/dev/null || true
+fi
 
 # Set up postgres
-if [ ! -f /var/lib/pgsql/initdb_postgresql.log ]; then
+if [ ! -f /var/lib/pgsql/initdb_postgresql.log ] && [ ! -f /var/lib/pgsql/data/PG_VERSION ]; then
 	postgresql-setup --initdb --unit postgresql
+fi
 
-	systemctl enable postgresql
-	systemctl start postgresql
+systemctl enable postgresql
+systemctl start postgresql
 
+if ! su - postgres -c "psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='gvm'\"" 2>/dev/null | grep -q 1; then
 	su - postgres -c "createuser -DRS gvm"
+fi
+if ! su - postgres -c "psql -lqt" 2>/dev/null | cut -d \| -f 1 | grep -qw gvmd; then
 	su - postgres -c "createdb -O gvm gvmd"
 	su - postgres -c "psql gvmd -q --command='create role dba with superuser noinherit;'"
 	su - postgres -c "psql gvmd -q --command='grant dba to gvm;'"
@@ -108,47 +125,88 @@ fi
 
 
 
-# redis setup
-if [  -f /etc/redis.conf ]; then
-	REDIS_CONF=/etc/redis.conf
+# redis / valkey setup
+KV_SERVICE=""
+KV_CONF=""
+KV_GROUP=""
+KV_SOCK=""
+
+if [ -f /etc/valkey/valkey.conf ]; then
+	KV_SERVICE="valkey"
+	KV_CONF="/etc/valkey/valkey.conf"
+	KV_GROUP="valkey"
+	KV_SOCK="/run/valkey/valkey.sock"
+elif [ -f /etc/valkey.conf ]; then
+	KV_SERVICE="valkey"
+	KV_CONF="/etc/valkey.conf"
+	KV_GROUP="valkey"
+	KV_SOCK="/run/valkey/valkey.sock"
 elif [ -f /etc/redis/redis.conf ]; then
-	REDIS_CONF=/etc/redis/redis.conf
+	KV_SERVICE="redis"
+	KV_CONF="/etc/redis/redis.conf"
+	KV_GROUP="redis"
+	KV_SOCK="/run/redis/redis.sock"
+elif [ -f /etc/redis.conf ]; then
+	KV_SERVICE="redis"
+	KV_CONF="/etc/redis.conf"
+	KV_GROUP="redis"
+	KV_SOCK="/run/redis/redis.sock"
 else
-	echo "Error: Redis configuration was not detected"
+	echo "Error: Neither Redis nor Valkey configuration was detected"
 	exit 1
 fi
 
+mkdir -p "$(dirname "$KV_SOCK")"
+chown "$KV_GROUP:$KV_GROUP" "$(dirname "$KV_SOCK")" 2>/dev/null || true
 
-if ! grep -q "^unixsocket /var/run/redis/redis.sock" $REDIS_CONF ; then
-  	sed -i -e 's/^\(#.\)\?unixsocket \/.*$/unixsocket \/var\/run\/redis\/redis.sock/' $REDIS_CONF
+if ! grep -q "^unixsocket $KV_SOCK" "$KV_CONF" ; then
+	sed -i -e "s|^\(#.\)\?unixsocket /.*$|unixsocket $KV_SOCK|" "$KV_CONF"
+	if ! grep -q "^unixsocket " "$KV_CONF"; then
+		echo "unixsocket $KV_SOCK" >> "$KV_CONF"
+	fi
 fi
 
-
-if ! grep -q ^unixsocketperm.*770 $REDIS_CONF; then
-  	sed -i -e 's/^\(#.\)\?unixsocketperm.*$/unixsocketperm 770/' $REDIS_CONF
-  	sed -i -e 's/^\(#.\)\?port.*$/port 0/' $REDIS_CONF
+if grep -q "unixsocketgroup" "$KV_CONF"; then
+	sed -i -E "s/^#?\s*unixsocketgroup.*/unixsocketgroup $KV_GROUP/" "$KV_CONF"
+else
+	echo "unixsocketgroup $KV_GROUP" >> "$KV_CONF"
 fi
+
+if grep -q "unixsocketperm" "$KV_CONF"; then
+	sed -i -E "s/^#?\s*unixsocketperm.*/unixsocketperm 770/" "$KV_CONF"
+else
+	echo "unixsocketperm 770" >> "$KV_CONF"
+fi
+
+sed -i -E "s/^#?\s*port [0-9]+/port 0/" "$KV_CONF"
 
 # Bugfix for openvas (temporary)
-sed -i "s/^save/#save/g" $REDIS_CONF
+sed -i "s/^save/#save/g" "$KV_CONF"
 
-if grep ^db_address /etc/openvas/openvassd.conf 2>/dev/null; then
-	sed -i -e 's/db_address=.*$/db_address=\/var\/run\/redis\/redis.sock/' /etc/openvas/openvas.conf
+mkdir -p /etc/openvas
+if grep -q ^db_address /etc/openvas/openvas.conf 2>/dev/null; then
+	sed -i -e "s|^db_address=.*$|db_address=$KV_SOCK|" /etc/openvas/openvas.conf
 else
-	echo "db_address=/var/run/redis/redis.sock" >> /etc/openvas/openvas.conf
+	echo "db_address=$KV_SOCK" >> /etc/openvas/openvas.conf
 fi
 
-if ! grep -q "^databases 512" $REDIS_CONF; then
-	sed -i "s/^databases.*/databases 512/g" $REDIS_CONF
+# Compatibility symlink for tools hardcoded to /run/redis/redis.sock
+mkdir -p /run/redis
+ln -sf "$KV_SOCK" /run/redis/redis.sock
+
+if grep -q "databases" "$KV_CONF"; then
+	sed -i -E "s/^#?\s*databases [0-9]+/databases 512/" "$KV_CONF"
+else
+	echo "databases 512" >> "$KV_CONF"
 fi 
 
-# Add uer to redis socket
-if ! groups gvm |grep -q redis ; then
-	usermod -aG redis gvm
+# Add user to redis/valkey socket group
+if ! groups gvm 2>/dev/null | grep -q "$KV_GROUP" ; then
+	usermod -aG "$KV_GROUP" gvm
 fi
 
-systemctl enable redis
-systemctl start redis
+systemctl enable "$KV_SERVICE"
+systemctl restart "$KV_SERVICE"
 
 #Set sysctl
 sysctl -w net.core.somaxconn=1024
@@ -175,22 +233,24 @@ echo "Please note this step could take some time."
 echo "Once completed, this will be updated automatically every 24 hours"
 echo
 
+FEED_SYNC="$(command -v greenbone-feed-sync 2>/dev/null || echo /usr/bin/greenbone-feed-sync)"
+
 echo
 echo "Updating NVTs...." 
-download_update /usr/bin/greenbone-nvt-sync /var/lib/gvm/plugins/plugin_feed_info.inc
+download_update "$FEED_SYNC --type nvt" /var/lib/openvas/plugins/plugin_feed_info.inc
 
 echo
 echo "Updating GVMD_DATA..."
-download_update  "/usr/sbin/greenbone-feed-sync --type GVMD_DATA" /var/lib/gvm/data-objects/gvmd/${GVM_VERSION}/timestamp
+download_update "$FEED_SYNC --type gvmd-data" /var/lib/gvm/data-objects/gvmd/timestamp
 
 echo
 echo "Updating SCAP data..."
-download_update "/usr/sbin/greenbone-feed-sync --type SCAP" /var/lib/gvm/scap-data/official-cpe-dictionary_v2.2.xml
+download_update "$FEED_SYNC --type scap" /var/lib/gvm/scap-data/timestamp
 
 
 echo
 echo "Updating CERT data..."
-download_update "/usr/sbin/greenbone-feed-sync --type CERT"  /var/lib/gvm/cert-data/timestamp
+download_update "$FEED_SYNC --type cert"  /var/lib/gvm/cert-data/timestamp
 
 
 su - gvm -c "openvas --update-vt-info"
@@ -210,12 +270,14 @@ echo
 
 
 # Start ospd
-systemctl start ospd-openvas
+systemctl enable ospd-openvas
+systemctl restart ospd-openvas
 
 # Start gvmd
-systemctl start gvmd 
+systemctl enable gvmd
+systemctl restart gvmd 
 
-if [ ! -f /var/lib/gvm/data-objects/gvmd/${GVM_VERSION}/timestamp ]; then
+if ! compgen -G "/var/lib/gvm/data-objects/gvmd/*/timestamp" >/dev/null 2>&1 && [ ! -f /var/lib/gvm/data-objects/gvmd/timestamp ]; then
 	echo "Error: GVMD Private data not found. "
 	echo "  exiting..."
 	exit 1
@@ -243,35 +305,39 @@ if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 
 	USERNAME=admin
 
-	# Suppress output of password.
-	if [[ -t 0 ]]; then
-		stty -echo
-	fi
-
-	# Prompt the user for the desired password and verify its accuracy.  
-	PASSCONFIRMED=0
-	while [ $PASSCONFIRMED -lt 1 ]; do
-		read -s -p "Enter Administrator Password: " PASSWORD
-		echo
-
-		read -s -p "Verify Administrator Password: " PASSWORD2
-		echo
-
-
-		if [ "$PASSWORD" == "$PASSWORD2" ]; then
-			if [ "$PASSWORD" == "" ]; then
-				echo "Empty password not allowed."
-				PASSCONFIRMED=0
-			else
-				PASSCONFIRMED=1
-			fi
-			echo
-		else
-			echo "Passwords do not match"
-			echo
+	if [ -n "$ADMIN_PASSWORD" ]; then
+		PASSWORD="$ADMIN_PASSWORD"
+	else
+		# Suppress output of password.
+		if [[ -t 0 ]]; then
+			stty -echo
 		fi
-	done
-	stty echo
+
+		# Prompt the user for the desired password and verify its accuracy.  
+		PASSCONFIRMED=0
+		while [ $PASSCONFIRMED -lt 1 ]; do
+			read -s -p "Enter Administrator Password: " PASSWORD
+			echo
+
+			read -s -p "Verify Administrator Password: " PASSWORD2
+			echo
+
+
+			if [ "$PASSWORD" == "$PASSWORD2" ]; then
+				if [ "$PASSWORD" == "" ]; then
+					echo "Empty password not allowed."
+					PASSCONFIRMED=0
+				else
+					PASSCONFIRMED=1
+				fi
+				echo
+			else
+				echo "Passwords do not match"
+				echo
+			fi
+		done
+		stty echo
+	fi
 
 
 	# Create admin user
@@ -286,26 +352,41 @@ if ! $(su - gvm -c "/usr/sbin/gvmd --get-users | grep -q ^admin$") ; then
 	fi
 	su - gvm -c "/usr/sbin/gvmd --modify-setting 78eceaec-3385-11ea-b237-28d24461215b --value $FEED_OWNER"
 
+	# Load scan configs, port lists, and report formats from feed
+	su - gvm -c "/usr/sbin/gvmd --rebuild-gvmd-data=all >/dev/null 2>&1 || true"
+
 fi
 
 # Mosquitto setup
+mkdir -p /etc/openvas
 if ! grep -q mqtt_server_uri /etc/openvas/openvas.conf; then
 	echo "mqtt_server_uri = localhost:1883" >> /etc/openvas/openvas.conf
 fi
 
-systemctl start mosquitto
-systemctl start gsad
-systemctl start notus-scanner
-systemctl enable ospd-openvas
-systemctl enable notus-scanner
-systemctl enable gvmd
-systemctl enable gsad
+# Configure GSAD systemd override for TLS and external access
+mkdir -p /etc/systemd/system/gsad.service.d
+cat << 'EOF' > /etc/systemd/system/gsad.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=/usr/sbin/gsad --foreground --listen 0.0.0.0 --port 9392 -k /var/lib/gvm/private/CA/serverkey.pem -c /var/lib/gvm/CA/servercert.pem
+EOF
+systemctl daemon-reload
+
 systemctl enable mosquitto
+systemctl restart mosquitto
+systemctl enable gsad
+systemctl restart gsad
+systemctl start notus-scanner 2>/dev/null || true
+systemctl enable notus-scanner 2>/dev/null || true
 
 # Set firewall rules
-DEFAULT_ZONE=$(firewall-cmd --get-default-zone)
-firewall-cmd --zone=$DEFAULT_ZONE --permanent --add-service=https
-firewall-cmd --reload
+if command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active firewalld >/dev/null 2>&1; then
+	DEFAULT_ZONE=$(firewall-cmd --get-default-zone 2>/dev/null || echo "public")
+	firewall-cmd --zone=$DEFAULT_ZONE --permanent --add-port=9392/tcp >/dev/null 2>&1 || true
+	firewall-cmd --zone=$DEFAULT_ZONE --permanent --add-service=https >/dev/null 2>&1 || true
+	firewall-cmd --zone=$DEFAULT_ZONE --permanent --add-forward-port=port=443:proto=tcp:toport=9392 >/dev/null 2>&1 || true
+	firewall-cmd --reload >/dev/null 2>&1 || true
+fi
 
 # Planned, this is not multi-run safe yet
 #if ! grep -q "Updating CERT info succeeded" /var/log/gvm/gvmd.log; then

@@ -31,8 +31,8 @@ Requires: openvas-scanner
 #Requires: OSPd
 Requires: OSPd-openvas
 Requires: gvmd
-Requires: greenbone-security-assistant
-Requires: redis
+Requires: (greenbone-security-assistant or gsad)
+Requires: valkey
 Requires: psmisc
 Requires: nmap
 # move to script, this is from epel 
@@ -45,15 +45,18 @@ Requires: greenbone-feed-sync
 # possibly fixes something
 Requires: perl-XML-Twig
 
-%if  0%{!?rhel} >= 6
+%if 0%{?rhel} >= 6
 # PDF reports
-Requires: texlive-texconfig texlive-metafont-bin  
+%if 0%{?rhel} <= 9
+Requires: texlive-texconfig texlive-metafont-bin
+%endif
 %else
+%if ! 0%{?fedora}
 Requires: texlive-texmf-latex
-#Requires: texlive-collection-latexextra
+%endif
 %endif
 
-%if 0%{?fedora} >= 21
+%if 0%{?fedora} >= 21 && ! 0%{?rhel}
 Requires: texlive-comment
 Requires: texlive-collection-latexextra
 %endif
@@ -103,6 +106,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Nov 8 2026 Scott R. Shinn <scott@atomicorp.com> - 26.43.0-RELEASE-AUTO
+- Support Valkey on EL10 and Fedora 41+
+- Add notus-scanner and gsad requirement fallbacks
+
 * Fri Nov 6 2026 Scott R. Shinn <scott@atomicorp.com> - 26.43.0-RELEASE-AUTO
 - Track the 26.43 manager line
 - Sync feeds with greenbone-feed-sync
