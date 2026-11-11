@@ -93,7 +93,8 @@ else
 fi
 
 # Ensure directories exist with proper ownership
-mkdir -p /var/lib/gvm /var/lib/openvas /var/log/gvm /var/lib/notus /etc/openvas
+mkdir -p /var/lib/gvm/.ssh /var/lib/openvas /var/log/gvm /var/lib/notus /etc/openvas
+chmod 700 /var/lib/gvm/.ssh 2>/dev/null || true
 chown -R gvm:gvm /var/lib/gvm /var/lib/openvas /var/log/gvm /var/lib/notus 2>/dev/null || true
 
 # Python 

@@ -44,6 +44,11 @@ Requires: openvas-smb
 Requires: greenbone-feed-sync
 # possibly fixes something
 Requires: perl-XML-Twig
+# Alert method helper tools
+Recommends: sshpass
+Recommends: samba-client
+Recommends: socat
+Recommends: net-snmp-utils
 
 %if 0%{?rhel} >= 6
 # PDF reports
@@ -106,9 +111,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Sun Nov 8 2026 Scott R. Shinn <scott@atomicorp.com> - 26.43.0-RELEASE-AUTO
+* Wed Nov 11 2026 Scott R. Shinn <scott@atomicorp.com> - 26.43.0-RELEASE-AUTO
 - Support Valkey on EL10 and Fedora 41+
 - Add notus-scanner and gsad requirement fallbacks
+- Add recommendations for alert method dependencies (sshpass, samba-client, socat, net-snmp-utils)
 
 * Fri Nov 6 2026 Scott R. Shinn <scott@atomicorp.com> - 26.43.0-RELEASE-AUTO
 - Track the 26.43 manager line
