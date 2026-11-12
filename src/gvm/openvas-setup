@@ -190,6 +190,10 @@ if grep -q ^db_address /etc/openvas/openvas.conf 2>/dev/null; then
 else
 	echo "db_address=$KV_SOCK" >> /etc/openvas/openvas.conf
 fi
+if ! grep -q "^mqtt_server_uri" /etc/openvas/openvas.conf 2>/dev/null; then
+	echo "mqtt_server_uri = localhost:1883" >> /etc/openvas/openvas.conf
+fi
+chown -R gvm:gvm /etc/openvas 2>/dev/null || true
 
 # Compatibility symlink for tools hardcoded to /run/redis/redis.sock
 mkdir -p /run/redis
@@ -226,6 +230,25 @@ if ! $(grub2-editenv - list | grep -q transparent_hugepage=never) ; then
 fi
 
 
+
+# Feed validation signing key
+if [ ! -f /etc/openvas/gnupg/pubring.kbx ]; then
+	echo -n "Importing Greenbone Community Feed signing key: "
+	GNUPG_TMP=$(mktemp -d /tmp/openvas-gnupg-XXXXXX)
+	if curl -f -s -L https://www.greenbone.net/GBCommunitySigningKey.asc -o "$GNUPG_TMP/GBCommunitySigningKey.asc"; then
+		GNUPGHOME="$GNUPG_TMP" gpg --import "$GNUPG_TMP/GBCommunitySigningKey.asc" >/dev/null 2>&1
+		echo "8AE4BE429B60A59B311C2E739823FAA60ED1E580:6:" | GNUPGHOME="$GNUPG_TMP" gpg --import-ownertrust >/dev/null 2>&1
+		mkdir -p /etc/openvas/gnupg
+		cp -r "$GNUPG_TMP"/* /etc/openvas/gnupg/ 2>/dev/null || true
+		chown -R gvm:gvm /etc/openvas/gnupg
+		chmod 700 /etc/openvas/gnupg
+		chmod 600 /etc/openvas/gnupg/* 2>/dev/null || true
+		echo "Complete"
+	else
+		echo "Skipped"
+	fi
+	rm -rf "$GNUPG_TMP"
+fi
 
 # Download NVT updates
 echo
