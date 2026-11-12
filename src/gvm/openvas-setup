@@ -93,9 +93,9 @@ else
 fi
 
 # Ensure directories exist with proper ownership
-mkdir -p /var/lib/gvm/.ssh /var/lib/openvas /var/log/gvm /var/lib/notus /etc/openvas
+mkdir -p /var/lib/gvm/.ssh /var/lib/openvas /var/log/gvm /var/lib/notus /etc/openvas /run/gvmd /run/ospd
 chmod 700 /var/lib/gvm/.ssh 2>/dev/null || true
-chown -R gvm:gvm /var/lib/gvm /var/lib/openvas /var/log/gvm /var/lib/notus 2>/dev/null || true
+chown -R gvm:gvm /var/lib/gvm /var/lib/openvas /var/log/gvm /var/lib/notus /run/gvmd /run/ospd 2>/dev/null || true
 
 # Python 
 if alternatives --list 2>/dev/null | grep -q '^python\b'; then
@@ -273,6 +273,12 @@ echo
 # Start ospd
 systemctl enable ospd-openvas
 systemctl restart ospd-openvas
+
+# Ensure gvmd is stopped before running database migration
+systemctl stop gvmd 2>/dev/null || true
+echo -n "Checking database migration: "
+su - gvm -c "/usr/sbin/gvmd --migrate" >/dev/null 2>&1 || true
+echo "Done"
 
 # Start gvmd
 systemctl enable gvmd
