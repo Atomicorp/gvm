@@ -49,6 +49,7 @@ Recommends: sshpass
 Recommends: samba-client
 Recommends: socat
 Recommends: net-snmp-utils
+Recommends: gvm-tools
 
 %if 0%{?rhel} >= 6
 # PDF reports
@@ -117,6 +118,7 @@ rm -rf $RPM_BUILD_ROOT
 - Add recommendations for alert method dependencies (sshpass, samba-client, socat, net-snmp-utils)
 - Automate gvmd database migration and runtime socket directory initialization in openvas-setup
 - Import Greenbone Community Feed signing key and configure MQTT URI in openvas-setup
+- Recommend gvm-tools for GMP/OSP CLI automation
 
 * Fri Nov 6 2026 Scott R. Shinn <scott@atomicorp.com> - 26.43.0-RELEASE-AUTO
 - Track the 26.43 manager line
