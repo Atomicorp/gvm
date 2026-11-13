@@ -1,76 +1,101 @@
-# GVM / Openvas Packaging Project 
+# GVM / OpenVAS Packaging Project 
 
-The GVM (Formerly: Openvas) project is an Atomicorp designed effort to install and configure the [Openvas](http://www.openvas.org) vulnerability scanner Version 21.04 on a Redhat, Rocky, Centos or Fedora Linux platforms.
+The GVM (formerly OpenVAS) packaging project is an Atomicorp-maintained distribution to install, configure, and maintain the [Greenbone Vulnerability Management](https://www.greenbone.net) suite (Version 26.43) on modern Enterprise Linux and Fedora platforms.
 
+Visit our website for the latest information: [www.atomicorp.com](https://www.atomicorp.com)
 
-Visit our website for the latest information.  [www.atomicorp.com](http://www.atomicorp.com)
+---
 
+## Currently Supported Platforms
 
-## Currently Supported Platforms 
+### Primary / Current Release (GVM 26.43)
+* **Enterprise Linux 10** (RHEL 10, Rocky Linux 10) — `x86_64`
+* **Fedora 44** — `x86_64`
+* **Fedora 45** — `x86_64`
 
-* RHEL 8/9
-* Rocky 8/9
-* Fedora 36
-* Fedora 37
+### Legacy / Archived Platforms
+* **Enterprise Linux 8 & 9** (GVM 21.04 / 22.04 legacy releases)
+* **Fedora 36 & 37** (End of Life)
 
+---
 
+## DNF Installation (Enterprise Linux 10 & Fedora)
 
-## Yum/DNF Automatic Installation ##
+### 1) Enable Prerequisites
 
-
-1) Install the Atomic Yum Repository
-
-```
-    wget -q -O - https://updates.atomicorp.com/installers/atomic | sudo sh
-```
-
-2) Install the GVM/openvas package
-
-```
-	# Redhat/Rocky/Centos 8 Only
-	yum config-manager --set-enabled powertools
-	yum install epel-release
-
-	# Redhat/Rocky 9 Only
-	yum config-manager --set-enabled crb
-	yum install epel-release
-
-	# 
-	yum install gvm
+**For RHEL 10 / Rocky Linux 10:**
+```bash
+sudo dnf config-manager --set-enabled crb
+sudo dnf install -y epel-release
 ```
 
+**For Fedora 44 & 45:**
+No additional prerequisite repositories are required.
 
-3) Configure openvas
-```
-    gvm-setup
-```
+### 2) Install the Atomicorp Repository
 
-
-## Docker Installation ##
-
-The [Atomicorp Openvas Docker Project](https://github.com/atomicorp/openvas-docker) is available from docker hub:
-
-```
-    docker pull atomicorp/openvas  
+```bash
+wget -q -O - https://updates.atomicorp.com/installers/atomic | sudo sh
 ```
 
+### 3) Install the GVM Metapackage
 
-## Join us on Slack ##
+```bash
+sudo dnf install -y gvm
+```
 
-Need help? Want to collaborate? 
+### 4) Configure and Initialize GVM
 
-[Join Atomicorp Slack](https://atomicorp-support.slack.com/)
+Run the automated setup utility to initialize PostgreSQL, Valkey, feed keys, vulnerability feeds, and administrative accounts:
 
+```bash
+sudo gvm-setup
+```
 
-## Credits and Thanks ##
+Once configuration completes, access the Greenbone Security Assistant (GSA) web interface at:
+`https://<your-server-ip>:9392` or `https://<your-server-ip>`
+
+---
+
+## Docker Installation
+
+The [Atomicorp OpenVAS Docker Project](https://github.com/atomicorp/openvas-docker) provides a pre-configured, self-contained container based on Rocky Linux 10:
+
+```bash
+# Pull the latest image
+docker pull atomicorp/openvas:latest
+
+# Create persistent storage volumes
+docker volume create gvm_data
+docker volume create gvm_plugins
+docker volume create gvm_db
+
+# Run the container
+docker run -d \
+  --name openvas \
+  -p 443:443 \
+  -v gvm_data:/var/lib/gvm \
+  -v gvm_plugins:/var/lib/openvas \
+  -v gvm_db:/var/lib/pgsql \
+  atomicorp/openvas
+```
+
+For full container documentation, visit [Atomicorp/openvas-docker](https://github.com/Atomicorp/openvas-docker).
+
+---
+
+## Community & Support
+
+* **Atomicorp Community Support:** [https://atomicorp.com/support/](https://atomicorp.com/support/)
+* **Issue Tracker:** [GitHub Issues](https://github.com/Atomicorp/gvm/issues)
+* **Greenbone Community Portal:** [https://community.greenbone.net/](https://community.greenbone.net/)
+
+---
+
+## Credits and Thanks
 
 * Michael Meyer @Greenbone
-
 * Jan-Oliver Wagner @Greenbone
-
-* Everyone at Greenbone that made this project possible
-
-* Fredrik Hilmersson https://libellux.com
-
+* Everyone at Greenbone who makes the open-source GVM project possible
+* Fredrik Hilmersson (https://libellux.com)
 * Cody Woods @hcw2016
-
