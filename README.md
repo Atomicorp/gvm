@@ -19,6 +19,26 @@ Visit our website for the latest information: [www.atomicorp.com](https://www.at
 
 ---
 
+## Stack Architecture & Components
+
+The Atomicorp GVM 26.43 packaging bundles and coordinates the modern Greenbone stack:
+
+| Component | Upstream Package | Description |
+|---|---|---|
+| **GVMD** | `gvmd 26.43` | Greenbone Vulnerability Manager daemon |
+| **OpenVAS Scanner** | `openvas-scanner 23.52` | Vulnerability assessment scanner & NASL interpreter |
+| **GVM Libraries** | `gvm-libs 23.16` | Core networking, protocol, and utility libraries |
+| **GSA / GSAD** | `gsad 27.7` | Greenbone Security Assistant (React Web UI & HTTP daemon) |
+| **GVM Tools** | `gvm-tools 26.1` | CLI automation tools (`gvm-cli`, `python-gvm 27.10`) |
+| **OSPd-OpenVAS** | `ospd-openvas 22.10` | Open Scanner Protocol daemon wrapper |
+| **SMB Support** | `openvas-smb 22.5` | Authenticated Windows SMB/WMI scanning engine |
+| **PostgreSQL Extension** | `pg-gvm 22.6` | Custom PostgreSQL functions for GVM |
+| **Feed Sync** | `greenbone-feed-sync 25.5` | Vulnerability feed synchronization utility |
+| **Cache & DB** | Valkey 8 & PostgreSQL 16 | High-performance in-memory cache and relational database |
+| **Broker** | Mosquitto 2.0+ | MQTT publish/subscribe messaging broker |
+
+---
+
 ## DNF Installation (Enterprise Linux 10 & Fedora)
 
 ### 1) Enable Prerequisites
